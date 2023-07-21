@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resource/qml/main.qml</file>
+        <file>resource/qml/components/dailyRecord.qml</file>
+        <file>resource/qml/components/discoveryRecord.qml</file>
+        <file>resource/qml/components/inspectionRecord.qml</file>
+        <file>resource/qml/components/qmldir</file>
+        <file>resource/qml/components/quarterlyRecord.qml</file>
+    </qresource>
+</RCC>
