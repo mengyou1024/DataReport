@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ruitiedefine.h"
 #include "xlsxdocument.h"
 #include <QDate>
 #include <QFile>
@@ -21,30 +22,18 @@ namespace Ruitie {
      * @param fileName 文件名
      * @return 数据指针
      */
-    template <typename... T>
-    bool loadFile(QString fileName, T *...ptr) {
-        QFile file(fileName);
-        if (!file.exists()) {
-            qCritical(TAG_Ruitie) << "file:" << fileName << "is not exist";
-            return false;
-        }
-        file.open(QFile::ReadOnly);
-        if (!file.isOpen()) {
-            qCritical(TAG_Ruitie) << "file:" << fileName << "open failed";
-            return false;
-        }
-        qDebug(TAG_Ruitie) << "file:" << fileName << file.size() << "bytes";
+    bool loadFile(const QString &fileName, RecData &data);
 
-        (file.read(reinterpret_cast<char *>(ptr), sizeof(T)), ...);
-
-        file.close();
-        return true;
-    }
-    template <typename... T>
-    bool loadFile(QString fileName, shared_ptr<T>... ptr) {
-        qDebug(TAG_Ruitie) << "loadFile(filename, ...)<shared_ptr>";
-        return loadFile(fileName, (ptr.get(), ...));
-    }
+    class DataLoader {
+    public:
+        static shared_ptr<RecData> getRecData(QString &fileName) {
+            auto ret = make_shared<RecData>();
+            if (!loadFile(fileName, *ret.get())) {
+                return nullptr;
+            }
+            return ret;
+        }
+    };
 
     /**
      * @brief saveFile 保存文件
@@ -53,7 +42,7 @@ namespace Ruitie {
      * @return bool
      */
     template <typename... T>
-    bool saveFile(QString fileName, T *...ptr) {
+    bool saveFile(QString &fileName, T *...ptr) {
         if (fileName.isEmpty()) {
             qCritical(TAG_Ruitie) << "fileName is empty";
             return false;
@@ -71,7 +60,7 @@ namespace Ruitie {
     }
 
     template <typename... T>
-    bool saveFile(QString fileName, shared_ptr<T>... ptr) {
+    bool saveFile(QString &fileName, shared_ptr<T>... ptr) {
         qDebug(TAG_Ruitie) << "saveFile(filename, ...)<shared_ptr>";
         return saveFile(fileName, (ptr.get(), ...));
     }
@@ -81,13 +70,13 @@ namespace Ruitie {
     class QuarterlyRecordMsg;
     class DailyRecordMsg;
     template <>
-    bool saveFile(QString fileName, DiscoveryRecordMsg *ptr);
+    bool saveFile(QString &fileName, DiscoveryRecordMsg *ptr);
     template <>
-    bool saveFile(QString fileName, InspectionRecordMsg *ptr);
+    bool saveFile(QString &fileName, InspectionRecordMsg *ptr);
     template <>
-    bool saveFile(QString fileName, QuarterlyRecordMsg *ptr);
+    bool saveFile(QString &fileName, QuarterlyRecordMsg *ptr);
     template <>
-    bool saveFile(QString fileName, DailyRecordMsg *ptr);
+    bool saveFile(QString &fileName, DailyRecordMsg *ptr);
 
     // 探伤记录模型
     class InspectionRecordModel : public QObject {

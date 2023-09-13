@@ -11,7 +11,6 @@ FluPopup {
     property string neutralText: "Neutral"
     property string negativeText: "Negative"
     property string positiveText: "Positive"
-    property int delayTime: 100
     signal neutralClicked
     signal negativeClicked
     signal positiveClicked
@@ -89,8 +88,7 @@ FluPopup {
                     text: neutralText
                     onClicked: {
                         popup.close()
-                        timer_delay.targetFlags = FluContentDialog.NeutralButton
-                        timer_delay.restart()
+                        neutralClicked()
                     }
                 }
                 FluButton{
@@ -101,8 +99,7 @@ FluPopup {
                     text: negativeText
                     onClicked: {
                         popup.close()
-                        timer_delay.targetFlags = FluContentDialog.NegativeButton
-                        timer_delay.restart()
+                        negativeClicked()
                     }
                 }
                 FluFilledButton{
@@ -113,26 +110,9 @@ FluPopup {
                     text: positiveText
                     onClicked: {
                         popup.close()
-                        timer_delay.targetFlags = FluContentDialog.PositiveButton
-                        timer_delay.restart()
+                        positiveClicked()
                     }
                 }
-            }
-        }
-    }
-    Timer{
-        property int targetFlags
-        id:timer_delay
-        interval: popup.delayTime
-        onTriggered: {
-            if(targetFlags === FluContentDialog.NegativeButton){
-                negativeClicked()
-            }
-            if(targetFlags === FluContentDialog.NeutralButton){
-                neutralClicked()
-            }
-            if(targetFlags === FluContentDialog.PositiveButton){
-                positiveClicked()
             }
         }
     }

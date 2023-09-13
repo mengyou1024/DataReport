@@ -32,10 +32,8 @@ Button {
     background: Rectangle{
         implicitWidth: 28
         implicitHeight: 28
-        radius: 4
         FluFocusRectangle{
             visible: control.visualFocus
-            radius:4
         }
         color:{
             if(!enabled){

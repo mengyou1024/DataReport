@@ -69,11 +69,17 @@ Button {
                 return borderNormalColor
             }
             Rectangle {
-                width:  20
-                x:checked ? control_backgound.width-width : 0
+                width: pressed ? 28 : 20
+                anchors{
+                    left: checked ? undefined : parent.left
+                    leftMargin: checked ? 20 : 0
+                    right: checked ? parent.right : undefined
+                    rightMargin: checked ? 0: 20
+                }
                 height: 20
                 radius: 10
                 scale: hovered&enabled ? 7/10 : 6/10
+                anchors.verticalCenter: parent.verticalCenter
                 color: {
                     if(!enabled){
                         return dotDisableColor
@@ -83,15 +89,27 @@ Button {
                     }
                     return dotNormalColor
                 }
-                Behavior on x  {
-                    enabled:  FluTheme.enableAnimation
+                Behavior on anchors.leftMargin  {
                     NumberAnimation {
+                        duration: 167
+                        easing.type: Easing.OutCubic
+                    }
+                }
+                Behavior on anchors.rightMargin  {
+                    NumberAnimation {
+                        duration: 167
+                        easing.type: Easing.OutCubic
+                    }
+                }
+                Behavior on width {
+                    NumberAnimation {
+                        duration: 167
                         easing.type: Easing.OutCubic
                     }
                 }
                 Behavior on scale {
-                    enabled: FluTheme.enableAnimation
                     NumberAnimation {
+                        duration: 167
                         easing.type: Easing.OutCubic
                     }
                 }

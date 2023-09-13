@@ -83,7 +83,6 @@ TextField{
             right: parent.right
             rightMargin: closeRightMargin
         }
-        contentDescription:"清空"
         onClicked:{
             control.text = ""
         }

@@ -49,7 +49,7 @@ Source: "@MOROSE_DIST_DIR@/*"; DestDir: "{app}"; Flags: ignoreversion recursesub
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [UninstallDelete]
-Type: filesandordirs; Name: "{app}/log"
+@MOROSE_UNINSTALL_DELETE_STRING@
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

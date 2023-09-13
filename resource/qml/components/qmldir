@@ -4,3 +4,5 @@ DiscoveryRecord 1.0 discoveryRecord.qml
 InspectionRecord 1.0 inspectionRecord.qml
 QuarterlyRecord 1.0 quarterlyRecord.qml
 DailyRecord 1.0 dailyRecord.qml
+FolderComboBox 1.0 folderComboBox.qml
+FileSelect 1.0 FileSelect.qml

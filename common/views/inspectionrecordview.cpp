@@ -10,8 +10,8 @@ int Ruitie::InspectionRecordView::columnCount(const QModelIndex &) const {
 
 QVariant Ruitie::InspectionRecordView::data(const QModelIndex &index, int role) const {
     if (index.row() == 0) {
-        static QVector<QString> headName = {"序号",     "车轮型号", "炉号",     "车轮编号", "缺陷数量",  "径向(mm)",
-                                            "轴向(mm)", "波高(%)",  "dB差(dB)", "探伤结果", "灵敏度(dB)"};
+        static QVector<QString> headName = {"序号", "车轮型号", "炉号", "车轮编号", "缺陷数量", "径向(mm)",
+                                            "轴向(mm)", "波高(%)", "dB差(dB)", "探伤结果", "灵敏度(dB)"};
         return headName[index.column()];
     } else {
         int _i = index.row() - 1;

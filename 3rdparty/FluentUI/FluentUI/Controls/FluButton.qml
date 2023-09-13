@@ -42,7 +42,6 @@ Button {
         implicitHeight: 28
         border.color: FluTheme.dark ? "#505050" : "#DFDFDF"
         border.width: 1
-        radius: 4
         color:{
             if(!enabled){
                 return disableColor
@@ -51,7 +50,6 @@ Button {
         }
         FluFocusRectangle{
             visible: control.activeFocus
-            radius:4
         }
     }
     contentItem: FluText {

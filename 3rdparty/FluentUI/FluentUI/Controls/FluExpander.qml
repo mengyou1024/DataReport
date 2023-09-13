@@ -54,7 +54,6 @@ Item {
                 iconSource:FluentIcons.ChevronUp
                 iconSize: 15
                 Behavior on rotation {
-                    enabled: FluTheme.enableAnimation
                     NumberAnimation{
                         duration: 167
                         easing.type: Easing.OutCubic
@@ -104,7 +103,7 @@ Item {
                     to:"expand"
                     NumberAnimation {
                         properties: "y"
-                        duration: FluTheme.enableAnimation ? 167 : 0
+                        duration: 167
                         easing.type: Easing.OutCubic
                     }
                 },
@@ -112,7 +111,7 @@ Item {
                     to:"collapsed"
                     NumberAnimation {
                         properties: "y"
-                        duration: FluTheme.enableAnimation ? 167 : 0
+                        duration: 167
                         easing.type: Easing.OutCubic
                     }
                 }

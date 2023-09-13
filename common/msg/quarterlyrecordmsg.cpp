@@ -7,7 +7,7 @@
  * @return
  */
 template <>
-bool Ruitie::saveFile(QString fileName, QuarterlyRecordMsg *ptr) {
+bool Ruitie::saveFile(QString &fileName, QuarterlyRecordMsg *ptr) {
     if (fileName.isEmpty() || !ptr) {
         qCritical(TAG_Ruitie) << "save QuarterlyRecordMsg in" << fileName << "failed";
         return false;

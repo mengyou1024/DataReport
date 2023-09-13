@@ -33,60 +33,46 @@ namespace Ruitie {
         void    setManufactureCompany(const QString &newManufactureCompany);
         QString getManufactureDate() const;
         void    setManufactureDate(const QString &newManufactureDate);
+        QString getPrintDate() const;
+        void    setPrintDate(const QString &newPrintDate);
 
         Q_INVOKABLE bool saveFile(QString fileName) {
             return Ruitie::saveFile(fileName, this);
         }
 
         Q_INVOKABLE bool loadFile(QString fileName) {
-#define READ_DATA(P)                                        \
-    do {                                                    \
-        file.read(reinterpret_cast<char *>(&P), sizeof(P)); \
-    } while (0)
-
             QFile file(fileName);
             if (!file.exists()) {
-                qCritical(TAG_Ruitie) << fileName << "is no exists";
+                qCritical(TAG_Ruitie) << "file:" << fileName << "is not exsist";
                 return false;
             }
-            file.open(QFile::ReadOnly);
-            if (!file.isOpen()) {
-                qCritical(TAG_Ruitie) << fileName << "open failed";
+            if (!file.open(QFile::ReadOnly)) {
+                qCritical(TAG_Ruitie()) << "file:" << fileName << "open failed";
                 return false;
             }
+            DB_QUARTER_DATA quartData = {};
+            file.read((char *)&quartData, sizeof(DB_QUARTER_DATA));
+            file.close();
             // 解析数据
-            SYS_PARA        sysPara;
-            DB_QUARTER_DATA dbQuarterData;
-            DB_USER_DATA    dbUserData;
-            READ_DATA(sysPara);
-            READ_DATA(dbQuarterData);
-            READ_DATA(dbUserData);
-            setCompanyName(QString(sysPara.szUseOrg));
-            setPrintDate("TODO:printDate");
-            setInstrumentType(QString(sysPara.szMadeModal));
-            setInstrumentSerial(QString(sysPara.szMadeSerial));
-            setManufactureCompany(QString(sysPara.szMadeFact));
-            setManufactureDate(QString(sysPara.szMadeDate));
+            setCompanyName(QString::fromStdWString(L"江苏瑞铁轨道装备股份有限公司"));
+            setPrintDate(QDateTime::currentDateTime().toString("yyyy-M-d"));
+            setInstrumentType(QString::fromStdWString(L""));
+            setInstrumentSerial(QString::fromStdWString(L""));
+            setManufactureCompany(QString::fromStdWString(L"江苏瑞铁轨道装备股份有限公司"));
+            setManufactureDate(QString(quartData.m_dtTime));
             for (int i = 0; i < 5; i++) {
-                probeType[i]   = QString(dbQuarterData.szProbeType);
-                probeSerial[i] = QString::number(dbQuarterData.nParam2);
+                probeType[i]   = QString::fromStdWString(L"");
+                probeSerial[i] = QString::number(0);
             }
             for (int i = 0; i < 10; i++) {
-                performance[i][0] = QString::number(dbQuarterData.m_nSensitivityMargin);
-                performance[i][1] = QString::number(dbQuarterData.m_nDistinguishValuel[i]);
-                performance[i][2] = QString::number(dbQuarterData.m_nHorLinearity[i]);
-                performance[i][3] = QString::number(dbQuarterData.m_nVerLinearity[i]);
-                performance[i][4] = QString::number(dbQuarterData.m_nDynamicRange[i]);
+                performance[i][0] = QString::number(quartData.m_nSensitivityMargin[i]);
+                performance[i][1] = QString::number(quartData.m_nDistinguishValuel[i]);
+                performance[i][2] = QString::number(quartData.m_nHorLinearity[i]);
+                performance[i][3] = QString::number(quartData.m_nVerLinearity[i]);
+                performance[i][4] = QString::number(quartData.m_nDynamicRange[i]);
             }
-
-#undef READ_DATA
-
-            file.close();
             return true;
         }
-
-        QString getPrintDate() const;
-        void    setPrintDate(const QString &newPrintDate);
 
     signals:
         void companyNameChanged();

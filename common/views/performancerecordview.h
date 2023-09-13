@@ -34,8 +34,7 @@ namespace Ruitie {
         void performanceRecordPtrChanged();
 
     private:
-        Q_PROPERTY(QuarterlyRecordMsg *performanceRecordPtr READ getPerformanceRecordPtr WRITE setPerformanceRecordPtr NOTIFY
-                       performanceRecordPtrChanged)
+        Q_PROPERTY(QuarterlyRecordMsg *performanceRecordPtr READ getPerformanceRecordPtr WRITE setPerformanceRecordPtr NOTIFY performanceRecordPtrChanged)
     };
 
 } // namespace Ruitie

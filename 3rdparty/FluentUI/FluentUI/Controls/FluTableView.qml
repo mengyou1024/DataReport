@@ -246,7 +246,7 @@ Rectangle {
                     }
                     onClicked:
                         (event)=>{
-                            item_loader.sourceComponent = undefined
+                            item_loader.sourceComponent = null
                             if(!(event.modifiers & Qt.ControlModifier)){
                                 selection_model.clear()
                             }
@@ -279,7 +279,7 @@ Rectangle {
             property int column
             property int row
             property var tableView: control
-            sourceComponent: undefined
+            sourceComponent: null
             onDisplayChanged: {
                 var obj = table_model.getRow(row)
                 obj[columnSource[column].dataIndex] = display

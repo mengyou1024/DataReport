@@ -22,29 +22,33 @@ FluTextBox{
         id:control_popup
         y:control.height
         focus: false
-//        modal: true
-//        Overlay.modal: Item{}
-
-        padding: 0
         enter: Transition {
             NumberAnimation {
                 property: "opacity"
                 from:0
                 to:1
-                duration: FluTheme.enableAnimation ? 83 : 0
+                duration: 83
             }
         }
-        contentItem: FluRectangle{
-            radius: [4,4,4,4]
+        onVisibleChanged: {
+            if(visible){
+                list_view.currentIndex = -1
+            }
+        }
+        background: Rectangle{
+            id:container
+            width: control.width
+            radius: 4
             FluShadow{
                 radius: 4
             }
             color: FluTheme.dark ? Qt.rgba(51/255,48/255,48/255,1) : Qt.rgba(248/255,250/255,253/255,1)
+            height: 38*Math.min(Math.max(list_view.count,1),8)
             ListView{
                 id:list_view
                 anchors.fill: parent
                 clip: true
-                boundsBehavior: ListView.StopAtBounds
+                currentIndex: -1
                 ScrollBar.vertical: FluScrollBar {}
                 header: Item{
                     width: control.width
@@ -59,38 +63,52 @@ FluTextBox{
                         }
                     }
                 }
-                delegate:FluControl{
-                    id:item_control
-                    height: 38
+                delegate:Control{
                     width: control.width
-                    onClicked:{
-                        handleClick(modelData)
-                    }
+                    padding:10
                     background: Rectangle{
-                        FluFocusRectangle{
-                            visible: item_control.activeFocus
-                            radius:4
-                        }
                         color:  {
+                            if(list_view.currentIndex === index){
+                                return FluTheme.dark ? Qt.rgba(63/255,60/255,61/255,1) : Qt.rgba(237/255,237/255,242/255,1)
+                            }
                             if(hovered){
                                 return FluTheme.dark ? Qt.rgba(63/255,60/255,61/255,1) : Qt.rgba(237/255,237/255,242/255,1)
                             }
                             return FluTheme.dark ? Qt.rgba(51/255,48/255,48/255,1) : Qt.rgba(0,0,0,0)
                         }
+                        MouseArea{
+                            id:mouse_area
+                            anchors.fill: parent
+                            Connections{
+                                target: control
+                                function onHandleClicked(){
+                                    if((list_view.currentIndex === index)){
+                                        handleClick(modelData)
+                                    }
+                                }
+                            }
+                            onClicked: handleClick(modelData)
+                        }
+                        Rectangle{
+                            width: 3
+                            color:FluTheme.primaryColor.dark
+                            visible: list_view.currentIndex === index
+                            radius: 3
+                            height: 20
+                            anchors{
+                                left: parent.left
+                                verticalCenter: parent.verticalCenter
+                            }
+                        }
                     }
                     contentItem: FluText{
                         text:modelData.title
-                        leftPadding: 10
-                        rightPadding: 10
-                        verticalAlignment : Qt.AlignVCenter
+                        anchors{
+                            verticalCenter: parent.verticalCenter
+                        }
                     }
                 }
             }
-        }
-        background: Item{
-            id:container
-            implicitWidth: control.width
-            implicitHeight: 38*Math.min(Math.max(list_view.count,1),8)
         }
     }
     onTextChanged: {

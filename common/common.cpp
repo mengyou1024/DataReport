@@ -5,6 +5,7 @@
 #include "msg/discoveryrecordmsg.h"
 #include "msg/inspectionrecordmsg.h"
 #include "msg/quarterlyrecordmsg.h"
+#include "qframelesswindow.h"
 #include "views/datatablemodel.h"
 #include "views/defectrecordview.h"
 #include "views/inspectionrecordview.h"
@@ -25,8 +26,6 @@ void Morose::logMessageHandler(QtMsgType type, const QMessageLogContext &context
     }
     QString logLevel;
     QString logCategory = QString("[%1]%2").arg(QString(context.category), QString(maxCatelogyLen - categoryLen, ' '));
-    QString logLineInfo = QString("File:(%1) Line:(%2)").arg(QString(context.file)).arg(context.line);
-    QString logTimeInfo = QDateTime::currentDateTime().toString("[yyyy-MM-dd hh:mm:ss.zzz]");
 
     switch (type) {
         case QtDebugMsg: {
@@ -50,9 +49,18 @@ void Morose::logMessageHandler(QtMsgType type, const QMessageLogContext &context
             break;
         }
     }
-    QString message = QString("%1 %2 %3 \t %4 \t\t-- %5\r\n")
-                          .arg(logTimeInfo, logLevel, logCategory, QString("%1%2").arg(msg, QString(maxMsgLen - msgLen, ' ')), logLineInfo);
-    QFile file("./log/log.txt");
+
+#if defined(QT_DEBUG)
+    QString message = QString("%2 %3 \t %4\r\n").arg(logLevel, logCategory, QString("%1%2").arg(msg, QString(maxMsgLen - msgLen, ' ')));
+    mutex.lock();
+    printf(message.toLocal8Bit());
+    fflush(stdout);
+    mutex.unlock();
+#else
+    QString logLineInfo = QString("File:(%1) Line:(%2)").arg(QString(context.file)).arg(context.line);
+    QString logTimeInfo = QDateTime::currentDateTime().toString("[yyyy-MM-dd hh:mm:ss.zzz]");
+    QString message     = QString("%1 %2 %3 \t %4 \t\t-- %5\r\n").arg(logTimeInfo, logLevel, logCategory, QString("%1%2").arg(msg, QString(maxMsgLen - msgLen, ' ')), logLineInfo);
+    QFile   file("./log/log.txt");
     mutex.lock();
     if (file.size() > 1024 * 1024 * 4) {
         QFile::copy("log/log.txt", "log/log0.txt");
@@ -72,6 +80,7 @@ void Morose::logMessageHandler(QtMsgType type, const QMessageLogContext &context
     file.flush();
     file.close();
     mutex.unlock();
+#endif
 }
 
 void Morose::registerVariable(QQmlContext *context) {
@@ -89,67 +98,49 @@ void Morose::registerVariable(QQmlContext *context) {
     qmlRegisterType<Ruitie::InspectionRecordView>("mengyou.Model", 1, 0, "InspectionRecordView");
     qmlRegisterType<Ruitie::PerformanceRecordView>("mengyou.Model", 1, 0, "PerformanceRecordView");
     qmlRegisterType<Ruitie::ExcelRunner>("mengyou.Model", 1, 0, "ExcelRunner");
+    qmlRegisterType<QFramelessWindow>("mengyou.Model", 1, 0, "QFramelessWindow");
+    auto    json    = loadGlobalEnvironment();
+    auto    dataDir = json["dataDir"];
+    QString dirStr  = "";
+    if (dataDir.isString()) {
+        QUrl url(dataDir.toString());
+        if (url.isRelative()) {
+            dirStr = QCoreApplication::applicationDirPath() + "/" + url.toString();
+        } else {
+            dirStr = url.toString();
+        }
+    }
+    qInfo(TAG_Ruitie) << "APP_DATA_DIR:" << dirStr;
+    context->setContextProperty("APP_DATA_DIR", dirStr);
 }
 
 #ifdef MOROSE_TEST
 
     #include "ruitiedefine.h"
 
-void testSaveFile() {
-    using namespace Ruitie;
-    using namespace std;
-    // dailyrecord
-    auto constexpr tableSize      = 5;
-    SYS_PARA      sysPara         = {};
-    CH_PARA       chPara          = {};
-    PLC_SCAN_PAPA plcScanPara     = {};
-    WHEEL_PAPA    wheelPara       = {};
-    DB_USER_DATA  dbUserData      = {};
-    DB_SCAN_DATA  dbScanData      = {};
-    dbScanData.nTotalDefectNum    = tableSize;
-    dbScanData.lTotalScanSize     = tableSize;
-    DB_QUARTER_DATA dbQuarterData = {};
-
-    struct nDB_DEFECT_DATA {
-        DB_DEFECT_DATA dbDefectData[tableSize];
-    };
-    struct nDB_SCAN_DATA {
-        DB_SCAN_DATA nDbScanData[tableSize];
-    };
-
-    nDB_DEFECT_DATA ndbDefectData = {};
-
-    nDB_SCAN_DATA nDbScanData = {};
-
-    for (int i = 0, j = 0; i < dbScanData.nTotalDefectNum; i++) {
-        ndbDefectData.dbDefectData[i].nAxialDepth     = j++;
-        ndbDefectData.dbDefectData[i].nRadialDistance = j++;
-        ndbDefectData.dbDefectData[i].nWaveHeight     = j++;
-
-        strcpy_s(nDbScanData.nDbScanData[i].szWheelNumber, QString::number(j++).toStdString().c_str());
-    }
-    strcpy_s(sysPara.szUseOrg, "瑞铁");
-    strcpy_s(sysPara.szMadeModal, "u230718");
-    strcpy_s(sysPara.szMadeSerial, "23718");
-    strcpy_s(sysPara.szMadeFact, "Union");
-    strcpy_s(sysPara.szMadeDate, "2023-7-18");
-    strcpy_s(dbQuarterData.szProbeType, "水浸探头");
-    dbQuarterData.nParam2              = 114514;
-    dbQuarterData.m_nSensitivityMargin = 9527;
-    for (int i = 0, j = 0; i < 10; i++) {
-        dbQuarterData.m_nDistinguishValuel[i] = ++j;
-        dbQuarterData.m_nHorLinearity[i]      = ++j;
-        dbQuarterData.m_nVerLinearity[i]      = ++j;
-        dbQuarterData.m_nDynamicRange[i]      = ++j;
-    }
-    saveFile("dailyRecord.bin", &sysPara, &chPara, &plcScanPara, &wheelPara, &dbUserData, &dbScanData, &ndbDefectData, &nDbScanData);
-    saveFile("discoveryRecord.bin", &sysPara, &chPara, &plcScanPara, &wheelPara, &dbUserData, &dbScanData, &ndbDefectData, &nDbScanData);
-    saveFile("inspectionRecord.bin", &sysPara, &chPara, &plcScanPara, &wheelPara, &dbUserData, &dbScanData, &ndbDefectData, &nDbScanData);
-    saveFile("quarterlyRecord.bin", &sysPara, &dbQuarterData, &dbUserData);
-}
-
 void Morose::test(void) {
-    testSaveFile();
+    Ruitie::RecData data;
+    qint64          time = QDateTime::currentMSecsSinceEpoch();
+    Ruitie::loadFile(R"(C:\Users\Administrator\Desktop\Mutilple\x64\Debug\Data\Scan\202308\30\09-44-22.scdat)", data);
+    qInfo(TAG_Ruitie) << "loadFile spend time:" << QDateTime::currentMSecsSinceEpoch() - time;
+    qInfo(TAG_Ruitie) << "data is valid:" << data.isValid();
 }
 
 #endif
+
+QJsonObject &Morose::getGlobalEnvironment() {
+    static QJsonObject obj;
+    return obj;
+}
+
+QJsonObject &Morose::loadGlobalEnvironment() {
+    QFile file("Config.json");
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+        if (doc.isObject()) {
+            getGlobalEnvironment() = doc.object();
+        }
+        file.close();
+    }
+    return getGlobalEnvironment();
+}

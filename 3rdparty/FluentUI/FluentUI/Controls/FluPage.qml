@@ -5,21 +5,14 @@ import QtQuick.Window
 import FluentUI
 
 Item {
-    enum LaunchMode{
-        Standard = 0,
-        SingleTask = 1,
-        SingleTop = 2,
-        SingleInstance = 3
-    }
-    property int launchMode: FluPage.SingleTop
+    property int pageMode: FluNavigationView.SingleTop
     property bool animDisabled: false
     property string url : ""
     id: control
     opacity: visible
     visible: false
-    StackView.onRemoved: destroy()
     Behavior on opacity{
-        enabled: !animDisabled && FluTheme.enableAnimation
+        enabled: !animDisabled
         NumberAnimation{
             duration: 167
         }
@@ -27,7 +20,7 @@ Item {
     transform: Translate {
         y: control.visible ? 0 : 80
         Behavior on y{
-            enabled: !animDisabled && FluTheme.enableAnimation
+            enabled: !animDisabled
             NumberAnimation{
                 duration: 167
                 easing.type: Easing.OutCubic

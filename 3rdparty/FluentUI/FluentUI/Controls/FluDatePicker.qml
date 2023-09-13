@@ -9,6 +9,10 @@ Rectangle {
     property color hoverColor: FluTheme.dark ? Qt.rgba(68/255,68/255,68/255,1) : Qt.rgba(251/255,251/255,251/255,1)
     property color normalColor: FluTheme.dark ? Qt.rgba(61/255,61/255,61/255,1) : Qt.rgba(254/255,254/255,254/255,1)
     property bool showYear: true
+    property alias yearText: text_year.text
+    property alias monthText: text_month.text
+    property alias dayText: text_day.text
+
     property var current
     id:control
     color: {
@@ -101,7 +105,7 @@ Rectangle {
                 property: "opacity"
                 from:0
                 to:1
-                duration: FluTheme.enableAnimation ? 83 : 0
+                duration: 83
             }
         }
         exit:Transition {
@@ -109,19 +113,17 @@ Rectangle {
                 property: "opacity"
                 from:1
                 to:0
-                duration: FluTheme.enableAnimation ? 83 : 0
+                duration: 83
             }
         }
         background:Item{
             FluShadow{
-                radius: 4
             }
         }
         contentItem: Item{
             clip: true
             Rectangle{
                 id:container
-                radius: 4
                 width: 300
                 height: 340
                 color: FluTheme.dark ? Qt.rgba(51/255,48/255,48/255,1) : Qt.rgba(248/255,250/255,253/255,1)
@@ -129,7 +131,6 @@ Rectangle {
                     anchors.fill: parent
                 }
                 FluShadow{
-                    radius: 4
                 }
                 RowLayout{
                     id:layout_content
@@ -151,24 +152,15 @@ Rectangle {
                             }
                             Rectangle{
                                 anchors.fill: parent
-                                anchors.topMargin: 2
-                                anchors.bottomMargin: 2
-                                anchors.leftMargin: 5
-                                anchors.rightMargin: 5
                                 color:  {
                                     if(getListView().currentIndex === position){
-                                        if(FluTheme.dark){
-                                            return  item_mouse.containsMouse ? Qt.darker(FluTheme.primaryColor.lighter,1.1) : FluTheme.primaryColor.lighter
-                                        }else{
-                                            return  item_mouse.containsMouse ? Qt.lighter(FluTheme.primaryColor.dark,1.1): FluTheme.primaryColor.dark
-                                        }
+                                        return item_mouse.containsMouse?Qt.lighter("#c1e3ff", 1.1):"#c1e3ff"
                                     }
                                     if(item_mouse.containsMouse){
-                                        return FluTheme.dark ? Qt.rgba(63/255,60/255,61/255,1) : Qt.rgba(237/255,237/255,242/255,1)
+                                        return "#e9f5ff"
                                     }
-                                    return FluTheme.dark ? Qt.rgba(51/255,48/255,48/255,1) : Qt.rgba(0,0,0,0)
+                                    return "transparent"
                                 }
-                                radius: 3
                                 MouseArea{
                                     id:item_mouse
                                     anchors.fill: parent
@@ -197,15 +189,7 @@ Rectangle {
                                 FluText{
                                     text:model
                                     color: {
-                                        if(getListView().currentIndex === position){
-                                            if(FluTheme.dark){
-                                                return Qt.rgba(0,0,0,1)
-                                            }else{
-                                                return Qt.rgba(1,1,1,1)
-                                            }
-                                        }else{
-                                            return FluTheme.dark ? "#FFFFFF" : "#1A1A1A"
-                                        }
+                                        return "000000"
                                     }
                                     anchors.centerIn: parent
                                 }
@@ -308,11 +292,14 @@ Rectangle {
                             verticalCenter: parent.verticalCenter
                         }
                         text: "取消"
+                        font.bold: true
+                        normalColor: "#eeeeee"
+                        hoverColor: "#1874cd"
                         onClicked: {
                             popup.close()
                         }
                     }
-                    FluFilledButton{
+                    FluButton{
                         anchors{
                             right: parent.right
                             left: divider.right
@@ -321,6 +308,10 @@ Rectangle {
                             verticalCenter: parent.verticalCenter
                         }
                         text: "确定"
+                        font.bold: true
+                        normalColor: "#eeeeee"
+                        hoverColor: "#1874cd"
+                        textColor: "#000000"
                         onClicked: {
                             d.changeFlag = false
                             popup.close()

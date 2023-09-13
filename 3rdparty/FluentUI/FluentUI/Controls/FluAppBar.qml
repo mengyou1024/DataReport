@@ -19,9 +19,6 @@ Rectangle{
     property color closeNormalColor: Qt.rgba(0,0,0,0)
     property color closeHoverColor:  Qt.rgba(251/255,115/255,115/255,1)
     property bool showDark: false
-    property bool showClose: true
-    property bool showMinimize: true
-    property bool showMaximize: true
     property bool titleVisible: true
     property bool isMac: FluTools.isMacos()
     property color borerlessColor : FluTheme.dark ? FluTheme.primaryColor.lighter : FluTheme.primaryColor.dark
@@ -99,7 +96,7 @@ Rectangle{
             iconSize: 11
             text:minimizeText
             radius: 0
-            visible: !isMac && showMinimize
+            visible: !isMac
             iconColor: root.textColor
             color: hovered ? minimizeHoverColor : minimizeNormalColor
             onClicked: minClickListener()
@@ -111,7 +108,7 @@ Rectangle{
             iconSource : d.isRestore  ? FluentIcons.ChromeRestore : FluentIcons.ChromeMaximize
             color: hovered ? maximizeHoverColor : maximizeNormalColor
             Layout.alignment: Qt.AlignVCenter
-            visible: d.resizable && !isMac && showMaximize
+            visible: d.resizable && !isMac
             radius: 0
             iconColor: root.textColor
             text:d.isRestore?restoreText:maximizeText
@@ -125,7 +122,7 @@ Rectangle{
             text:closeText
             width: 40
             height: 30
-            visible: !isMac && showClose
+            visible: !isMac
             radius: 0
             iconSize: 10
             iconColor: hovered ? Qt.rgba(1,1,1,1) : root.textColor

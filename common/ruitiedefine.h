@@ -1,130 +1,62 @@
 #pragma once
 
+#include <QDebug>
+#include <QFile>
+#include <QString>
+#include <cstddef>
 #include <cstdint>
+#include <cstdlib>
+#include <vector>
+#include <windows.h>
 
 namespace Ruitie {
+    constexpr int HD_CHANNEL_NUM = 10;                     ///< 硬件通道数
+    constexpr int DAC_HOLE_NUM   = 10;                     ///< DAC 采集孔的个数
 
-    using INT32    = int32_t;
-    using INT8     = int8_t;
-    using TCHAR    = char;
-    using UINT32   = uint32_t;
-    using BOOL     = bool;
-    using DATE     = double;
-    using COLORREF = unsigned long;
+    constexpr uint32_t FK_NEWFILE            = 0x55545041; ///< 开始位
+    constexpr uint32_t FK_DATA_SYSFILE       = 0x55545042; ///< 系统参数位 System
+    constexpr uint32_t FK_DATA_CHFILE        = 0x55545043; ///< 通道参数位  Channel*10
+    constexpr uint32_t FK_DATA_SPECIFILE     = 0x55545044; ///< 工件参数/车轮参数
+    constexpr uint32_t FK_DATA_PLCFILE       = 0x55545045; ///< PLC下发的参数
+    constexpr uint32_t FK_DATA_USERFILE      = 0x55545046; ///< 当前探伤工信息
+    constexpr uint32_t FK_DATA_STDDETECTFILE = 0x55545047; ///< 标准探伤数据
+    constexpr uint32_t FK_DATA_SCANFILE      = 0x55545048; ///< 扫差数据
+    constexpr uint32_t FK_DATA_DEFECTFILE    = 0x55545049; ///< 缺陷数据
+    constexpr uint32_t FK_DATA_END           = 0x55545050; ///< 数据结束
 
-    // 系统参数 包括板卡系统参数， 设备参数  ，等其他一次性参数
-    struct SYS_PARA {
-        // 超声参数
-        INT32 nFrequency;     // 重复频率 转换成下发的工作周期
-        INT32 nPulseWidth;    // 脉冲宽度
-        INT32 nTxFlag;        // 发射标志
-        INT32 nRxFlag;        // 接收标志
-        INT32 nChMode;        // 通道工作模式
-        INT32 nScanIncrement; // 扫查增量
-        INT32 nResetCoder;    // 编码器清零
-        INT32 nLEDStatus;     // LED灯
-        INT32 nWorkType;      // 工作模式
-        INT8  nControlTime;   // 控制信号消抖时间
-        INT8  nAxleTime;      // 计轴信号消抖时间
-        INT32 nVoltage;       // 电压
-        INT32 nCurrCh;        // 当前通道,最多10
-        INT32 nMaxGate;       // 最多门数,最多8
-        INT32 nDenoise;       // 平均次数
-
-        // 设备参数
-        TCHAR szMadeFact[20];   // 设备制造单位
-        TCHAR szMadeDate[20];   // 设备制造日期
-        TCHAR szMadeModal[20];  // 设备型号
-        TCHAR szMadeSerial[20]; // 设备编号
-        TCHAR szUseOrg[20];     // 使用机构 检测单位
-        TCHAR szUseXiu1[20];    // 大修日期
-        TCHAR szUseXiu2[20];    // 中修日期
-        TCHAR szUseXiu3[20];    // 小修日期
-        TCHAR szUseXiu4[20];    // 定检日期
-        // 其他待定参数
-
-        int   nParam1;
-        int   nParam2;
-        TCHAR szParam3[20];
-        TCHAR szParam4[20];
+    struct System {
+        int32_t Frequency;     ///< 重复频率
+        int32_t Voltage;       ///< 电压
+        int32_t PulseWidth;    ///< 脉冲宽度
+        int32_t TxFlag;        ///< 发射标志
+        int32_t RxFlag;        ///< 接收标志
+        int32_t ChMode;        ///< 通道工作模式
+        int32_t ScanIncrement; ///< 扫查增量
+        int32_t ResetCoder;    ///< 编码器清零
+        int32_t LEDStatus;     ///< LED灯
+        int32_t WorkType;      ///< 工作模式
+        int32_t ControlTime;
+        int32_t AxleTime;
     };
 
-    // 通道参数
-    struct CH_PARA {
-        TCHAR szTechName[20]; // 工艺名称
-        // 超声通道参数
-        UINT32 nDelay;        // 延时
-        UINT32 nSampleDepth;  // 采样深度
-        INT8   nSampleFactor; // 采样因子
-        INT8   nFilter;       // 滤波
-        INT8   nDemodu;       // 检波方式
-        INT8   nPhaseReverse; // 相位反转？
-        INT8   nActive[2];    // 波门激活
-        INT32  iRealSize;     // 实际采样点数  有声程和采样因子计算出下发
-        int    nZero;         // 零点
-        int    nAngle;        // 角度
-        int    nSpeed1;       // 液体声速
-        int    nSpeed2;       // 工件声速
-        ///////////////////////////////////////////////////////////////////////
-        int nCh_logic;          // 逻辑通道号   逻辑通道号 软通道，一般情况和收发一直，特殊情况收发不一致
-        int nCh_tr;             // 发射,最多256
-        int nCh_re;             // 接受,最多256
+    struct Channel {
+        uint32_t m_ChannelParamLen;  ///< 通道大小
+        float    m_fRange;           ///< 声程
+        int32_t  m_iVelocity;        ///< 声速
+        float    m_fDelay;           ///< 延时
+        float    m_fOffset;          ///< 零点
+        int32_t  m_iSampleFactor;    ///< 采样因子
+        float    m_fGain;            ///< 增益
+        int32_t  m_iFilter;          ///< 滤波
+        int32_t  m_iDemodu;          ///< 检波方式
+        int32_t  m_iPhaseReverse;    ///< 相位反转
 
-        int  nGain;             // 总增益  *10保存  = 灵敏度+补偿
-        int  nSensitivityGain;  // 灵敏度
-        int  nCompensateGain;   // 补偿
-        int  nSensitivityGain2; // 透声灵敏度
-        int  nCompensateGain2;  // 透声补偿
-        int  nGposi[5];
-        int  nGwide[5];
-        int  nGhigh[5];
-        int  nGtype[5];     // 当前门类型0进波1失波
-        int  nGalarm[5];    // 报警，－1不报警0全,1门A，2门B，3门C
-        BOOL nGRelative2_1; // 第二个门的性质，TRUE表示其门位是相对于门一内最大值的位置，FALSE表示独立
+        int32_t m_pGateAlarmType[2]; ///< 波门报警类型
+        float   m_pGatePos[2];       ///< 波门门位
+        float   m_pGateWidth[2];     ///< 波门宽度
+        float   m_pGateHeight[2];    ///< 波门高度
 
-        int nBSCANGtype;    // 报警类型 0进波1失波
-
-        int nBSCANGGalarm;  // 报警波门选择 0波门A 1波门B  其他待定
-
-        // DAC相关参数
-        int nDacDist[10]; // //点的声程
-        int nDacDb[10];   // 点的波幅
-        int nDacNum;      // 点数
-
-        // 探头相关
-        TCHAR szProbeType[10]; // 探头类型
-        INT32 nProbeFrequency; // 探头频率
-        int   nPreProbe;       // 探头前沿
-        TCHAR szProbeMake[10]; // 探头标识 A1 B1之类
-
-        // 通道相关
-        int   nCHNum;                   // 通道编号 1.23...
-        TCHAR szCHName[20];             // 通道名称 A1-径向
-        TCHAR szDetectionWheelArea[20]; // 检测的车轮部位
-    };
-
-    // 自动控制相关的参数 需要下发plc
-    struct PLC_SCAN_PAPA {
-        /**
-        扫查参数相关 自动控制相关 数值
-        Y方向以 轮轴中心为原点 向右位正 向左为负
-        Y方向以探头归0位置为原点，向下为正。
-        */
-
-        // 侧面相关
-        int nSideYPos;   // 侧面探头压合无须上下扫查移动
-        int nSideXStart; // 侧面探头的X起始点
-        int nSideXEnd;   // 侧面探头的X结束点
-        int nSideXStep;  // 侧面探头的步进值
-        int nSideParam1; // 待定参数
-        int nSideParam2; // 待定参数
-        // 踏面相关
-        int nTreadXPos;   // 踏面探头检测位置，无须左右移动
-        int nTreadYStart; // 踏面探头的Y起始点
-        int nTreadYEnd;   // 踏面探头的Y结束点
-        int nTreadYStep;  // 踏面探头的步进值
-        int nTreadParam1; // 待定参数
-        int nTreadParam2; // 待定参数
+        int32_t m_iGateBType;        ///< 波门2类型
     };
 
     // 车轮参数
@@ -139,114 +71,161 @@ namespace Ruitie {
         TCHAR szDetectionStd[20];     // 探伤标准 TB/T2995-200
         TCHAR szDetectionContent[50]; // 探伤内容   缺陷小于Ф2mm平地孔当量，内侧面检测时低波衰减不低于4dB
         TCHAR szDetectionArea[20];    // 探伤区域  踏面 内侧面
-        TCHAR szDetectionFact[20];    // 检测单位
-
+        TCHAR szDetectionFact[50];    // 检测单位
+        TCHAR szDeviceName[50];       // 设备名称
         // 车轮尺寸
-        int nWheelHub;               // 轮毂厚度
-        int nWheelRim;               // 轮辋厚度
-        int nWheelInnerSideOffset;   // 轮毂内侧面与轮辋内侧面高度差（-n~+n）
-        int nWheelInnerDiameter;     // 车轮内径
-        int nWheelHubOuterDiameter;  // 轮毂外径
-        int nWheelRimlInnerDiameter; // 轮辋内径
-        int nWheelRimOuterDiameter;  // 轮辋外径
+        FLOAT fWheelHub;               // 轮毂厚度  1
+        FLOAT fWheelRim;               // 轮辋厚度 2
+        FLOAT fWheelInnerSideOffset;   // 轮毂内侧面与轮辋内侧面高度差（-n~+n） 3
+        FLOAT fWheelHubInnerDiameter;  // 车轮内径 4
+        FLOAT fWheelHubOuterDiameter;  // 轮毂外径 5
+        FLOAT fWheelRimlInnerDiameter; // 轮辋内径 6
+        FLOAT fWheelRimOuterDiameter;  // 轮辋外径 7
         // 其他待定参数
-        int nWheelParam1;
-        int nWheelParam2;
-        int nWheelParam3;
-        int nWheelParam4;
+        FLOAT fTreadWidth; // 踏面探头间距（3组 轴向方向的间距，用于计算探头分段覆盖）
+        FLOAT fSideWidth;  // 侧面探头间距 （2组 径向方向的间距，用于计算探头分段覆盖）
+
+        FLOAT fWheelParam3;
+        FLOAT fWheelParam4;
     };
 
-    // 日常数据  无效特别处理，使用样轮径向扫查 列出扫查缺陷的db 误差值。
+    struct PLC_SCAN_PAPA {
+        // 扫差参数相关 自动控制相关 数值
+        // Y方向以 轮轴中心为原点 向右位正 向左为负
+        // Y方向以探头归0位置为原点，向下为正。
 
-    // 季度信息
-    struct DB_QUARTER_DATA {
-        DATE   m_dtTime;                 // 测试时间
-        TCHAR  m_szPerson[20];           // 测试人员姓名或工号
-        UINT32 m_nHorLinearity[10];      // 水平线性  以下五个为五大性能，季度是否合格通过5个性能值范围判断
-        UINT32 m_nVerLinearity[10];      // 垂直线行
-        UINT32 m_nDistinguishValuel[10]; // 分辨力
-        UINT32 m_nDynamicRange[10];      // 动态范围
-        UINT32 m_nSensitivityMargin;     // 动态范围灵敏度余量
+        // 侧面相关
+        float nSideYPos;   ///< 侧面探头压合无须上下扫差移动
 
-        TCHAR szProbeType[10];           // 探头类型
-        INT32 nProbeFrequency;           // 探头频率
-        int   nPreProbeNum;              // 探头编号
-        TCHAR szProbeMake[10];           // 探头标识 A1 B1之类
+        float nSideXStart; ///< 侧面探头的X起始点
+        float nSideXEnd;   ///< 侧面探头的X结束点
+        float nSideXStep;  ///< 侧面探头的步进值
+        float nSideParam1; ///< 待定参数
+        float nSideParam2; ///< 待定参数
+        // 踏面相关
+        float nTreadXPos;   ///< 踏面探头检测位置，无须左右移动
 
-        TCHAR m_szStdTestBlock[20];      // 标准试块型号
-
-        //	 其他待定参数
-        int   nParam1;
-        int   nParam2;
-        TCHAR szParam3[20];
-        TCHAR szParam4[20];
-    };
-
-    // 扫查数据
-    struct DB_SCAN_DATA {
-        TCHAR szWheelModel[20];   // 车轮型号
-        TCHAR szWheelNumber[20];  // 车轮编号
-        DATE  m_dtTime;           // 测试时间
-
-        int  nTotalDefectNum;     // 总缺陷个数
-        int  nTotalCircleNum;     // 总圈数最高20圈
-        long lEachCircleSize[20]; //  每圈的采样数据（0-360度时 所记录的帧数）最高20圈
-        long lTotalScanSize;      // 扫查总数据大小 byte单位   （所有圈数的10个通道的采样数据）
-    };
-
-    // 缺陷信息 一个检测数据有多条缺陷信息
-    struct DB_DEFECT_DATA {
-        int   nIndex;              // 缺陷索引号
-        int   nCircleIndex;        // 缺陷所在圈数
-        int   nCH;                 // 发现缺陷的通道
-        TCHAR szProbeMake[10];     // 探测架名称 探头标识 A1 B1之类
-        TCHAR szDetectionArea[20]; // 缺陷部位 踏面 /侧面
-        int   nDefectAngle;        // 缺陷角度
-        int   nRadialDistance;     // 径向距离
-        int   nAxialDepth;         // 轴向深度
-        int   nWaveHeight;         // 波高
-
-        int nDBOffset;             // dB差
-        int nTranslucency;         // 透声
-        int nSensitivity;          // 灵敏度
-
-        //	 其他待定参数
-        int   nParam1;
-        int   nParam2;
-        TCHAR szParam3[20];
-        TCHAR szParam4[20];
+        float nTreadYStart; ///< 踏面探头的Y起始点
+        float nTreadYEnd;   ///< 踏面探头的Y结束点
+        float nTreadYStep;  ///< 踏面探头的步进值
+        float nTreadParam1; ///< 待定参数
+        float nTreadParam2; ///< 待定参数
     };
 
     // 人员信息
     struct DB_USER_DATA {
-        long  lSerial;       // 自动编号
-        TCHAR strName[20];   // 检测人员
-        TCHAR strNumber[20]; // 工号
-        TCHAR strPwd[10];    // 密码
-        long  lLevel;        // 权限
-        TCHAR strRemark[40]; // 备注
+        long  lSerial;       ///< 自动编号
+        TCHAR strName[20];   ///< 检测人员
+        TCHAR strNumber[20]; ///< 工号
+        TCHAR strPwd[10];    ///< 密码
+        long  lLevel;        ///< 权限
+        TCHAR strRemark[40]; ///< 备注
     };
 
-    /*
-    车轮检测说明
-    1.一条工艺数据 =   SYS_PARA （系统参数）+ CH_PARA （通道参数 *10）+PLC_SCAN_PAPA（PLC参数）+ WHEEL_PAPA（车轮参数）
-    2.季度数据   = SYS_PARA （系统参数）+  DB_QUARTER_DATA（季度数据） + DB_USER_DATA（检测人员信息）
-    3.日常数据/扫查数据   =    一条工艺数据 + DB_USER_DATA（检测人员信息）+DB_SCAN_DATA（扫查数据）+
-    动态的缺陷数据（nTotalDefectNum*DB_DEFECT_DATA）+动态的扫查数据（lTotalScanSize个扫查数据）
-
-    //日常数据/扫查数据的区别为 日常数据 单独保存
-
-    */
-
-    // 原成像数据
-    struct CURVE_INFO {
-        int      x;     // 曲线区起始位置点
-        int      y;
-        int      cx;    // 曲线区水平点数
-        int      cy;    // 曲线区垂直点数
-        int      start; // 曲线在画图区之后的开始点
-        int      dots;  // 曲线点数
-        int      high;  // 门高度（只用于直方门）
-        COLORREF color; // 曲线颜色
+    // 数据记录
+    struct RECORD_DATA {
+        int32_t       pGatePos[2];                ///< 波门位置
+        int32_t       pGateAmp[2];                ///< 波门波幅
+        int64_t       iAscanSize[HD_CHANNEL_NUM]; ///< pAscan 大小
+        QVector<BYTE> pAscan[HD_CHANNEL_NUM];     ///< data
     };
+
+    struct DETECTION_PARAM2995_200 {
+        FLOAT fScanGain;                    // 探伤灵敏度
+        FLOAT fScanCompensate;              // 探伤补偿灵敏度
+
+        FLOAT fScanTrUTGain;                // 透声灵敏度
+        FLOAT fScanTrUTCompensate;          // 透声补偿
+
+        FLOAT fAperture;                    // 孔径
+        int   nUseHole;                     // 采样孔数
+
+        FLOAT fDAC_HoleDepth[DAC_HOLE_NUM]; // Dac 的孔深 位置  10 - 30 -50 -100mm
+        FLOAT fDAC_HolebAmp[DAC_HOLE_NUM];  // Dac的 孔的波幅 百分比   0-1
+
+        FLOAT fDAC_BaseGain;                // 制作Dac 的基准增益 母线增益 第一孔的增益
+        FLOAT fDAC_LineRD;                  // 记录线 与母线的dB
+        FLOAT fDAC_LineRL;                  // 判废线
+        FLOAT nDACGatePos[2];               // 波门门位 百分比  0-1 取值
+        FLOAT nDACWidth[2];                 // 波门宽度 百分比  0-1 取值
+
+        //	 其他待定参数
+        int nParam1;
+        int nParam2;
+    };
+
+    // 缺陷信息 一个检测数据有多条缺陷信息
+    struct DB_DEFECT_DATA {
+        int   nIndex;              // 缺陷索引号 当前通道内
+        int   nCircleIndex;        // 缺陷在最高波时所在圈数
+        int   nScanIndex;          // 缺陷在最高波时扫差数据的索引
+        int   nCH;                 // 发现缺陷的通道
+        TCHAR szProbeMake[10];     // 探测架名称 探头标识 A1 B1之类
+        TCHAR szDetectionArea[20]; // 缺陷部位 踏面 /侧面
+        float fProbleYPos;         // 发现缺陷时探头位置Y        nCH 0-5 为踏面位置     6-9为侧面位置
+        float fProbleXPos;         // 发现缺陷时探头位置X
+
+        float nRadialDistance;     // 径向距离  //踏面探头为 缺陷深度       侧面探头为探头位置
+        float nAxialDepth;         // 轴向深度    //踏面探头为 探头位置      侧面探头为缺陷深度
+        float nDefectAngle;        // 缺陷角度
+        int   nWaveHeight;         // 波高 0-255
+
+        float nDBOffset;           // dB差
+        float nSensitivity;        // 探伤灵敏度
+        float nTranslucency;       // 透声灵敏度
+        int   bDefectType;         // 0 缺陷 1. 透声不良
+
+        //	 其他待定参数
+        int   nParam1; // 首次发现缺陷的索引
+        int   nParam2; // 缺陷结束的索引
+        TCHAR szParam3[20];
+        TCHAR szParam4[20];
+    };
+
+    struct DB_QUARTER_DATA {
+        char  m_dtTime[10];             // 测试时间
+        TCHAR m_szPerson[20];           // 测试人员姓名或工号
+        float m_nHorLinearity[10];      // 水平线性  以下五个为五大性能，季度是否合格通过5个性能值范围判断
+        float m_nVerLinearity[10];      // 垂直线行
+        float m_nDistinguishValuel[10]; // 分辨力
+        float m_nDynamicRange[10];      // 动态范围
+        float m_nSensitivityMargin[10]; // 动态范围灵敏度余量
+
+        TCHAR szProbeType[10];          // 探头类型
+        INT32 nProbeFrequency;          // 探头频率
+        int   nPreProbeNum;             // 探头编号
+        TCHAR szProbeMake[10];          // 探头标识 A1 B1之类
+
+        TCHAR m_szStdTestBlock[20];     // 标准试块型号
+
+        //	 其他待定参数
+        int   nParam1;
+        int   nParam2;
+        TCHAR szParam3[20];
+        TCHAR szParam4[20];
+    };
+
+    class RecData {
+    public:
+        System                                   paramSystem;
+        Channel                                  paramChannel[HD_CHANNEL_NUM];
+        WHEEL_PAPA                               wheelParam;
+        PLC_SCAN_PAPA                            plcScanParam;
+        DB_USER_DATA                             dbUserData;
+        DETECTION_PARAM2995_200                  paramDetection[HD_CHANNEL_NUM];
+        QVector<RECORD_DATA>                     m_pRecord;
+        QVector<std::shared_ptr<DB_DEFECT_DATA>> m_pDefect[HD_CHANNEL_NUM];
+
+        inline bool isValid(void) const noexcept {
+            return m_Valid;
+        }
+
+        inline void setValid(bool newValid) noexcept {
+            m_Valid = newValid;
+        }
+
+    private:
+        bool m_Valid = false;
+    };
+
 } // namespace Ruitie

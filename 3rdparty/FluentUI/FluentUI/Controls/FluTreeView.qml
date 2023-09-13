@@ -105,6 +105,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
                     }
+
                     MouseArea{
                         id:item_layout_mouse
                         anchors.fill: parent
@@ -199,25 +200,15 @@ Item {
                     FluIconButton{
                         id:item_layout_expanded
                         color:"#00000000"
+                        iconSource:item_layout.expanded?FluentIcons.ChevronDown:FluentIcons.ChevronRight
                         opacity: item_layout.hasChild
+                        iconSize: 15
                         onClicked: {
                             if(!item_layout.hasChild){
                                 item_layout_rect.onClickItem()
                                 return
                             }
                             model.expanded = !model.expanded
-                        }
-                        contentItem: FluIcon{
-                            rotation: item_layout.expanded?0:-90
-                            iconSource:FluentIcons.ChevronDown
-                            iconSize: 15
-                            Behavior on rotation {
-                                enabled: FluTheme.enableAnimation
-                                NumberAnimation{
-                                    duration: 167
-                                    easing.type: Easing.OutCubic
-                                }
-                            }
                         }
                     }
                     FluText {
@@ -259,7 +250,6 @@ Item {
         model: tree_model
         flickableDirection: Flickable.HorizontalAndVerticalFlick
         clip: true
-        boundsBehavior: ListView.StopAtBounds
         ScrollBar.vertical: FluScrollBar {}
         ScrollBar.horizontal: FluScrollBar { }
     }

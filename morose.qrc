@@ -6,5 +6,8 @@
         <file>resource/qml/components/inspectionRecord.qml</file>
         <file>resource/qml/components/qmldir</file>
         <file>resource/qml/components/quarterlyRecord.qml</file>
+        <file>resource/img/bkimage.png</file>
+        <file>resource/qml/components/folderComboBox.qml</file>
+        <file>resource/qml/components/FileSelect.qml</file>
     </qresource>
 </RCC>

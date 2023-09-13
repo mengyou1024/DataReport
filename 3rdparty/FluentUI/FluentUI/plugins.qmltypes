@@ -199,11 +199,9 @@ Module {
         }
         Property { name: "darkMode"; type: "int"; notify: "darkModeChanged"; index: 2 }
         Property { name: "nativeText"; type: "bool"; notify: "nativeTextChanged"; index: 3 }
-        Property { name: "enableAnimation"; type: "bool"; notify: "enableAnimationChanged"; index: 4 }
         Signal { name: "primaryColorChanged" }
         Signal { name: "darkModeChanged" }
         Signal { name: "nativeTextChanged" }
-        Signal { name: "enableAnimationChanged" }
         Signal { name: "darkChanged" }
     }
     Component {

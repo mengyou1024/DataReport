@@ -29,7 +29,7 @@ QVariant Ruitie::PerformanceRecordView::data(const QModelIndex &index, int role)
         static QVector<QString> temp = {"试块型号", "CS-1-5", "CSK-1A", "CSK-1A", "CS-1-5", "CS-1-5"};
         return temp[index.column()];
     } else if (index.row() == 4) {
-        static QVector<QString> temp = {"标准值", "≥46dB", "≥26dB", "≤0.5%", "≤5%", "≥26dB"};
+        static QVector<QString> temp = {"标准值", "≥42dB", "≥26dB", "≤2%", "≤6%", "≥26dB"};
         return temp[index.column()];
     } else {
         if (index.column() == 0) {

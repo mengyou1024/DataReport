@@ -9,17 +9,27 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 REQUIRED COMPONENTS Quick)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 
+function(auto_add_subdirecory directory)
+    file(GLOB THIRDS_PATH "${directory}/*")
+    foreach(THIRD ${THIRDS_PATH})
+        if (IS_DIRECTORY "${THIRD}" AND EXISTS "${THIRD}/CMakeLists.txt")
+            file(RELATIVE_PATH THIRD_PATH ${CMAKE_CURRENT_SOURCE_DIR} ${THIRD})
+            add_subdirectory(${THIRD_PATH})
+        endif(IS_DIRECTORY "${THIRD}" AND EXISTS "${THIRD}/CMakeLists.txt")
+    endforeach(THIRD ${THIRD_PATH})
+endfunction(auto_add_subdirecory directory)
 
-include("3rdparty/FluentUI/FluentUI.cmake")
-include("3rdparty/QXlsx/QXlsx.cmake")
-include("3rdparty/SingleApplication/SingleApplication.cmake")
+auto_add_subdirecory("3rdparty")
+
+option(MOROSE_TEST "run test on main" OFF)
 
 if (MOROSE_TEST)
     add_compile_definitions("MOROSE_TEST")
 endif(MOROSE_TEST)
+
+add_compile_definitions("QAPPLICATION_CLASS=QGuiApplication")
 
 set(
     PROJECT_SOURCES
@@ -50,11 +60,13 @@ set(
     common/views/inspectionrecordview.cpp
     common/views/performancerecordview.h
     common/views/performancerecordview.cpp
+    common/qframelesswindow.h
+    common/qframelesswindow.cpp
 )
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Quick QXlsx::QXlsx SingleApplication::SingleApplication)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Quick QXlsx::QXlsx SingleApplication::SingleApplication dwmapi user32)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
 
@@ -62,11 +74,28 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 find_package(Morose)
 
-set(MOROSE_DIST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../x64/Debug/DataReport")
-
 if (Morose_FOUND)
     morose_main_setup()
     # 添加qml_dirs用于windeployqt部署
     morose_add_qml_dirs("resource/qml")
+#    morose_copy(
+#        TARGET ${PROJECT_NAME}
+#        FILES "script/Upgrade.exe"
+#        DIRS "template"
+#    )
+    morose_copy(
+        DIRS "templates/log"
+    )
+
+    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/config/ProductConfig.json")
+        message(FATAL_ERROR "no ProductConfig.json file please see ${CMAKE_SOURCE_DIR}/config/ProductConfigTemplate.json ")
+    endif(NOT EXISTS "${CMAKE_SOURCE_DIR}/config/ProductConfig.json")
+
+    morose_add_environment_config_file(
+        TARGET ${PROJECT_NAME}
+        DEPLOY "config/DeployConfig.json"
+        PRODUCT "config/ProductConfig.json"
+        DIST "Config.json"
+    )
     morose_auto_release()
 endif(Morose_FOUND)

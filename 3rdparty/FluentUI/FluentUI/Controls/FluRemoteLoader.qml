@@ -33,7 +33,4 @@ FluStatusView {
         var timestamp = Date.now();
         loader.source = control.source+"?"+timestamp
     }
-    function itemLodaer(){
-        return loader
-    }
 }

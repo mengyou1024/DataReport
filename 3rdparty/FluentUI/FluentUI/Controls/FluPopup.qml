@@ -20,12 +20,12 @@ Popup {
             properties: "scale"
             from:1.2
             to:1
-            duration: FluTheme.enableAnimation ? 83 : 0
+            duration: 83
             easing.type: Easing.OutCubic
         }
         NumberAnimation {
             property: "opacity"
-            duration: FluTheme.enableAnimation ? 83 : 0
+            duration: 83
             from:0
             to:1
         }
@@ -35,12 +35,12 @@ Popup {
             properties: "scale"
             from:1
             to:1.2
-            duration: FluTheme.enableAnimation ? 83 : 0
+            duration: 83
             easing.type: Easing.OutCubic
         }
         NumberAnimation {
             property: "opacity"
-            duration: FluTheme.enableAnimation ? 83 : 0
+            duration: 83
             from:1
             to:0
         }

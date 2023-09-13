@@ -47,7 +47,6 @@ Rectangle{
             }
         }
         Behavior on height{
-            enabled: FluTheme.enableAnimation
             NumberAnimation{
                 duration: 83
                 easing.type: Easing.OutCubic

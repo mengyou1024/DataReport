@@ -49,11 +49,7 @@ FluObject {
                 spacing: 20
                 width: parent.width
                 move: Transition {
-                    NumberAnimation {
-                        properties: "y"
-                        easing.type: Easing.OutCubic
-                        duration: FluTheme.enableAnimation ? 333 : 0
-                    }
+                    NumberAnimation { properties: "y"; easing.type: Easing.OutBack; duration: 300 }
                 }
                 onChildrenChanged: if(children.length === 0)  destroy();
                 function getLastloader(){
@@ -93,10 +89,9 @@ FluObject {
                     scale: item ? 1 : 0;
                     asynchronous: true
                     Behavior on scale {
-                        enabled: FluTheme.enableAnimation
                         NumberAnimation {
-                            easing.type: Easing.OutCubic
-                            duration: 167
+                            easing.type: Easing.OutBack;
+                            duration: 100
                         }
                     }
                     sourceComponent:itemcomponent ? itemcomponent : mcontrol.fluent_sytle;

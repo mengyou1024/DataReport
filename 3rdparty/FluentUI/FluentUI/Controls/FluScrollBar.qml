@@ -74,11 +74,14 @@ T.ScrollBar {
             }
             ,Transition {
                 to: "show"
-                NumberAnimation {
-                    target: rect_bar
-                    properties: vertical ? "width"  : "height"
-                    duration: 167
-                    easing.type: Easing.OutCubic
+                SequentialAnimation{
+                    PauseAnimation { duration: 100 }
+                    NumberAnimation {
+                        target: rect_bar
+                        properties: vertical ? "width"  : "height"
+                        duration: 167
+                        easing.type: Easing.OutCubic
+                    }
                 }
             }
         ]

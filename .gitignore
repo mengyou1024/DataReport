@@ -116,3 +116,5 @@ resource/html/About.html
 !packages.config
 !3rdparty/**/*.dll
 !3rdparty/**/*.a
+
+config/ProductConfig.json
