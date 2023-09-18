@@ -255,8 +255,12 @@ ColumnLayout {
         rootDir: dataDir
         dirType: "Scan"
         onAccepted: {
-            root_msg.loadFile(filePath)
-            flushTable()
+            if(!root_msg.loadFile(filePath)) {
+                showError("打开文件失败!")
+            } else {
+                showSuccess("打开文件成功!")
+                flushTable()
+            }
         }
     }
 

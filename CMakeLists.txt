@@ -22,6 +22,7 @@ function(auto_add_subdirecory directory)
 endfunction(auto_add_subdirecory directory)
 
 auto_add_subdirecory("3rdparty")
+add_subdirectory("3rdparty/QXlsx/QXlsx")
 
 option(MOROSE_TEST "run test on main" OFF)
 
@@ -87,9 +88,9 @@ if (Morose_FOUND)
         DIRS "templates/log"
     )
 
-    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/config/ProductConfig.json")
-        message(FATAL_ERROR "no ProductConfig.json file please see ${CMAKE_SOURCE_DIR}/config/ProductConfigTemplate.json ")
-    endif(NOT EXISTS "${CMAKE_SOURCE_DIR}/config/ProductConfig.json")
+    if((NOT EXISTS "${CMAKE_SOURCE_DIR}/config/ProductConfig.json") AND (NOT CMAKE_BUILD_TYPE STREQUAL "Release"))
+        message(FATAL_ERROR "no ProductConfig.json file please see ${CMAKE_SOURCE_DIR}/config/ProductConfigTemplate.json")
+    endif((NOT EXISTS "${CMAKE_SOURCE_DIR}/config/ProductConfig.json") AND (NOT CMAKE_BUILD_TYPE STREQUAL "Release"))
 
     morose_add_environment_config_file(
         TARGET ${PROJECT_NAME}

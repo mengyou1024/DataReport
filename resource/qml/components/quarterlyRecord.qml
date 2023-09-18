@@ -12,6 +12,22 @@ ColumnLayout {
     Layout.preferredWidth: parent.width
     QuarterlyRecordMsg {
         id: root_msg
+        onManufactureDateChanged: {
+            var locale = Qt.locale("zh_CN")
+            var date = Date.fromLocaleString(locale, manufactureDate, "yyyy-M-d")
+            manufacture_date_picker.current = date.toLocaleString(locale, "yyyy-M-d")
+            manufacture_date_picker.yearText = date.toLocaleString(locale, "yyyy")
+            manufacture_date_picker.monthText = date.toLocaleString(locale, "M")
+            manufacture_date_picker.dayText = date.toLocaleString(locale, "d")
+        }
+        onPrintDateChanged: {
+            var locale = Qt.locale("zh_CN")
+            var date = Date.fromLocaleString(locale, printDate, "yyyy-M-d")
+            date_picker.current = date.toLocaleString(locale, "yyyy-M-d")
+            date_picker.yearText = date.toLocaleString(locale, "yyyy")
+            date_picker.monthText = date.toLocaleString(locale, "M")
+            date_picker.dayText = date.toLocaleString(locale, "d")
+        }
     }
     ScrollView {
         Layout.alignment: Qt.AlignHCenter
@@ -234,8 +250,12 @@ ColumnLayout {
         rootDir: dataDir
         dirType: "QuartPerformance"
         onAccepted: {
-            root_msg.loadFile(filePath)
-            flushTable()
+            if(!root_msg.loadFile(filePath)) {
+                showError("打开文件失败!")
+            } else {
+                showSuccess("打开文件成功!")
+                flushTable()
+            }
         }
     }
 

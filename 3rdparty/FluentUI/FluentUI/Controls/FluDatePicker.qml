@@ -202,7 +202,7 @@ Rectangle {
                         height: parent.height
                         boundsBehavior:Flickable.StopAtBounds
                         ScrollBar.vertical: FluScrollBar {}
-                        model: generateYearArray(1924,2048)
+                        model: generateYearArray(1970,2100)
                         clip: true
                         preferredHighlightBegin: 0
                         preferredHighlightEnd: 0

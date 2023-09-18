@@ -37,8 +37,8 @@ UninstallDisplayName="@PROJECT_NAME@"
 UninstallDisplayIcon={#MoroseIcon}
 ArchitecturesInstallIn64BitMode=x64
 
-[Languages]
-Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+;[Languages]
+;Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked

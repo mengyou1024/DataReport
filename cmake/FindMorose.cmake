@@ -1,4 +1,4 @@
-set(MOROSE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/Mutilple.ico" CACHE STRING "Morose executable icon")
+set(MOROSE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/morose.ico" CACHE STRING "Morose executable icon")
 set(MOROSE_OUT_DIR "${CMAKE_SOURCE_DIR}/output" CACHE STRING "Morose output directory")
 set(MOROSE_DIST_DIR "${MOROSE_OUT_DIR}/dist" CACHE STRING "Morose dist directory")
 
@@ -93,8 +93,6 @@ endmacro(morose_main_setup)
     需要生成 `generate_exe_installer` 目标
 ]]
 function(morose_auto_release)
-    message(STATUS DELETE:${MOROSE_UNINSTALL_DELETE})
-
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
         # 生成inno setup 编译脚本
         set(MOROSE_UNINSTALL_DELETE_STRING "")
@@ -155,23 +153,6 @@ function(morose_auto_release)
                 ${MOROSE_DIST_DIR}
                 ${PLUGIN_DIRS}
                 ${QML_DIRS}
-                --no-translations
-                --no-system-d3d-compiler
-                --no-virtualkeyboard
-                --no-concurrent
-                --no-opengl-sw
-                --no-bluetooth
-                --no-quick3d
-                --no-sql
-                --no-test
-                --no-3dcore
-                --no-3dquick
-                --no-3dquickrenderer
-                --no-3dinput
-                --no-3danimation
-                --no-3dextras
-                --no-3dlogic
-                --no-3drenderer
                 # 执行ISCC进行打包
                 COMMAND echo "inno setup generate executable installer ..."
                 COMMAND ${ISCC_PATH} "${MOROSE_OUT_DIR}/pack-installer.iss" /Qp
@@ -305,12 +286,15 @@ function(morose_copy)
 
         foreach(ITEM ${COPY_FILES})
             get_filename_component(COPY_FILENAME ${ITEM} NAME)
+
             if(COPY_RENAME)
                 list(LENGTH COPY_FILES COPY_FILE_LEN)
-                if (COPY_FILE_LEN EQUAL "1")
+
+                if(COPY_FILE_LEN EQUAL "1")
                     set(COPY_FILENAME ${COPY_RENAME})
                 endif(COPY_FILE_LEN EQUAL "1")
             endif(COPY_RENAME)
+
             list(APPEND COPY_FILE_STRING COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/${ITEM}" "${CMAKE_BINARY_DIR}${COPY_DIST_DIR}${COPY_FILENAME}")
 
             if(CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -329,16 +313,18 @@ function(morose_copy)
             foreach(ITEM ${COPY_FILES})
                 # 添加到inno setup的卸载删除中
                 get_filename_component(DELETE_FILE_NAME ${ITEM} NAME)
+
                 if(COPY_RENAME)
                     list(LENGTH COPY_FILES COPY_FILE_LEN)
+
                     if(COPY_FILE_LEN EQUAL "1")
                         set(DELETE_FILE_NAME ${COPY_RENAME})
                     endif(COPY_FILE_LEN EQUAL "1")
                 endif(COPY_RENAME)
+
                 string(FIND "${MOROSE_UNINSTALL_DELETE}" "${COPY_DIST_DIR}${DELETE_FILE_NAME}" pos)
 
                 if(pos EQUAL -1)
-                    message(STATUS APPEND:"${COPY_DIST_DIR}${DELETE_FILE_NAME}")
                     set(MOROSE_UNINSTALL_DELETE ${MOROSE_UNINSTALL_DELETE} "${COPY_DIST_DIR}${DELETE_FILE_NAME}" CACHE INTERNAL "Morose Inno Setup delete file or directory")
                 endif(pos EQUAL -1)
             endforeach(ITEM ${COPY_FILES})
@@ -346,20 +332,20 @@ function(morose_copy)
     endif(COPY_FILES)
 
     if(COPY_DIRS)
-        message(STATUS COPY_DIRS:${COPY_DIRS})
-
         # 拷贝目录[列表]
         set(COPY_DIR_STRING "")
 
         foreach(ITEM ${COPY_DIRS})
             get_filename_component(COPY_DIRNAME ${ITEM} NAME)
+
             if(COPY_RENAME)
-                message(STATUS "COPY_RENAME:${COPY_RENAME}")
                 list(LENGTH COPY_DIRS COPY_DIR_LEN)
+
                 if(COPY_DIR_LEN EQUAL "1")
                     set(COPY_DIRNAME ${COPY_RENAME})
                 endif(COPY_DIR_LEN EQUAL "1")
             endif(COPY_RENAME)
+
             list(APPEND COPY_DIR_STRING COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/${ITEM}" "${CMAKE_BINARY_DIR}${COPY_DIST_DIR}${COPY_DIRNAME}")
 
             if(CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -376,16 +362,19 @@ function(morose_copy)
 
         if(CMAKE_BUILD_TYPE STREQUAL "Release")
             foreach(ITEM ${COPY_DIRS})
-                message(STATUS COPY_ITEM:${ITEM})
                 # 添加到inno setup的卸载删除中
                 get_filename_component(DELETE_DIR_NAME ${ITEM} NAME)
+
                 if(COPY_RENAME)
                     list(LENGTH COPY_DIRS COPY_DIR_LEN)
+
                     if(COPY_DIR_LEN EQUAL "1")
                         set(DELETE_DIR_NAME ${COPY_RENAME})
                     endif(COPY_DIR_LEN EQUAL "1")
                 endif(COPY_RENAME)
+
                 string(FIND "${MOROSE_UNINSTALL_DELETE}" "${COPY_DIST_DIR}${DELETE_DIR_NAME}" pos)
+
                 if(pos EQUAL -1)
                     set(MOROSE_UNINSTALL_DELETE ${MOROSE_UNINSTALL_DELETE} "${COPY_DIST_DIR}${DELETE_DIR_NAME}" CACHE INTERNAL "Morose Inno Setup delete file or directory")
                 endif(pos EQUAL -1)
@@ -396,20 +385,40 @@ endfunction(morose_copy)
 
 #[[
     添加环境配置文件
-    `morose_add_environment_config_file([TARGET] target [DEPLOY] deployConfigFile [PRODUCT] productConfigFile [DIST] distName)`
+    `morose_add_environment_config_file([TARGET] target [DEPLOY] deployConfigFile [PRODUCT] productConfigFile [DIST] distName [RUNTIME_USE_PRODUCT])`
+    `RUNTIME_USE_PRODUCT`: 在部署环境的运行时使用生产环境配置文件(仅在`CMAKE_BUILD_TYPE`为`Release`时起作用)
     `TARGET`: 依赖目标
     `DEPLOY`: 部署环境的配置文件
     `PRODUCT`: 生产环境的配置文件
     `DIST`: 生成的文件名
 ]]
 function(morose_add_environment_config_file)
+    set(options "RUNTIME_USE_PRODUCT")
     set(oneValueArgs "TARGET" "DEPLOY" "PRODUCT" "DIST")
     cmake_parse_arguments(CONF "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    set(CONF_FILE_STRING "")
+    get_filename_component(CONF_DEPLOY_FILE_NAME ${CONF_DEPLOY} NAME)
+    get_filename_component(CONF_PRODUCT_FILE_NAME ${CONF_PRODUCT} NAME)
+    # 拷贝ConfigFile至运行目录
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        morose_copy(TARGET ${CONF_TARGET} FILES ${CONF_DEPLOY} RENAME ${CONF_DIST})
+        if(CONF_RUNTIME_USE_PRODUCT)
+            list(APPEND CONF_FILE_STRING COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/${CONF_PRODUCT}" "${CMAKE_BINARY_DIR}/${CONF_DIST}")
+        else(CONF_RUNTIME_USE_PRODUCT)
+            list(APPEND CONF_FILE_STRING COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/${CONF_DEPLOY}" "${CMAKE_BINARY_DIR}/${CONF_DIST}")
+        endif(CONF_RUNTIME_USE_PRODUCT)
     else(CMAKE_BUILD_TYPE STREQUAL "Release")
-        morose_copy(TARGET ${CONF_TARGET} FILES ${CONF_PRODUCT} RENAME ${CONF_DIST})
+        list(APPEND CONF_FILE_STRING COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/${CONF_PRODUCT}" "${CMAKE_BINARY_DIR}/${CONF_DIST}")
     endif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        # 拷贝ConfigFile至发布目录
+        list(APPEND CONF_FILE_STRING COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/${CONF_DEPLOY}" "${MOROSE_DIST_DIR}/${CONF_DIST}")
+        # 添加至卸载的删除路径
+        string(FIND "${MOROSE_UNINSTALL_DELETE}" "/${CONF_DIST}" pos)
+        if(pos EQUAL -1)
+            set(MOROSE_UNINSTALL_DELETE ${MOROSE_UNINSTALL_DELETE} "/${CONF_DIST}" CACHE INTERNAL "Morose Inno Setup delete file or directory")
+        endif(pos EQUAL -1)
+    endif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    add_custom_command(TARGET ${CONF_TARGET} POST_BUILD ${CONF_FILE_STRING})
 endfunction(morose_add_environment_config_file)
 
 set(Morose_FOUND TRUE)
