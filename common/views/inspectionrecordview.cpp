@@ -20,13 +20,13 @@ QVariant Ruitie::InspectionRecordView::data(const QModelIndex &index, int role) 
             case 1: return datptr[_i].wheelType;
             case 2: return datptr[_i].heatSerial;
             case 3: return datptr[_i].wheelSerial;
-            case 4: return datptr[_i].defectsNum;
-            case 5: return datptr[_i].axial;
-            case 6: return datptr[_i].radial;
-            case 7: return datptr[_i].waveHeight;
-            case 8: return datptr[_i].dBDiff;
+            case 4: return QString::number(datptr[_i].defectsNum, 'f', 1);
+            case 5: return QString::number(datptr[_i].axial, 'f', 1);
+            case 6: return QString::number(datptr[_i].radial, 'f', 1);
+            case 7: return QString::number(datptr[_i].waveHeight, 'f', 1);
+            case 8: return QString::number(datptr[_i].dBDiff, 'f', 1);
             case 9: return datptr[_i].result;
-            case 10: return datptr[_i].sensitivity;
+            case 10: return QString::number(datptr[_i].sensitivity, 'f', 1);
             default: break;
         }
     }

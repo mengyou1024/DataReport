@@ -153,6 +153,7 @@ function(morose_auto_release)
                 ${MOROSE_DIST_DIR}
                 ${PLUGIN_DIRS}
                 ${QML_DIRS}
+
                 # 执行ISCC进行打包
                 COMMAND echo "inno setup generate executable installer ..."
                 COMMAND ${ISCC_PATH} "${MOROSE_OUT_DIR}/pack-installer.iss" /Qp
@@ -186,25 +187,6 @@ function(morose_auto_release)
 endfunction(morose_auto_release)
 
 #[[
-    添加插件的构建目录
-    `morose_add_plugins(PATH <path> [TARGET] target)`
-    `PATH` 插件路径
-    `TARGET` 插件的构建目标
-]]
-function(morose_add_plugins)
-    set(oneValueArgs PATH TARGET)
-    cmake_parse_arguments(MOROSE_ADD_PLUGINS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-    add_subdirectory(${MOROSE_ADD_PLUGINS_PATH})
-
-    if(NOT MOROSE_ADD_PLUGINS_TARGET)
-        get_filename_component(MOROSE_ADD_PLUGINS_TARGET ${PATH} NAME)
-    endif(NOT MOROSE_ADD_PLUGINS_TARGET)
-
-    message(STATUS "MOROSE_MAIN:${MOROSE_MAIN}, add plugin:[${MOROSE_ADD_PLUGINS_TARGET}]")
-    add_dependencies(${MOROSE_MAIN} ${MOROSE_ADD_PLUGINS_TARGET})
-endfunction(morose_add_plugins)
-
-#[[
     添加qml目录，用于`windeployqt`调用
     `morose_add_qml_dirs(...)`
     如果参数为空则将当前cmake源文件目录添加进去
@@ -221,11 +203,12 @@ endfunction(morose_add_qml_dirs)
 
 #[[
     设置当前项目为插件项目
-    `morose_plugin_setup([TYPE] type)`
+    `morose_plugin_setup([TYPE] type [TARGET] target)`
     `TYPE` 插件类型，默认为GENERIC 类型必须是`MOROSE_PLUGINS_TYPE`中的一个
+    `TARGET` 插件的生成目标，默认为${CMAKE_PROJECT_NAME} 
 ]]
 macro(morose_plugin_setup)
-    set(oneValueArgs "TYPE")
+    set(oneValueArgs "TYPE" "TARGET")
     cmake_parse_arguments(SETUP "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     if(SETUP_TYPE)
@@ -254,6 +237,14 @@ macro(morose_plugin_setup)
             COMMENT "copy plugin [${SETUP_TYPE}/${PROJECT_NAME}] to bundle directory"
         )
     endif(CMAKE_BUILD_TYPE STREQUAL "Release")
+
+    if(NOT SETUP_TARGET)
+        message(SEND_ERROR "not set TARGET")
+    else(NOT SETUP_TARGET)
+        add_dependencies(${MOROSE_MAIN} ${SETUP_TARGET})
+        message(STATUS "MOROSE_MAIN:${MOROSE_MAIN}, add plugin:[${SETUP_TARGET}]")
+    endif(NOT SETUP_TARGET)
+
 endmacro(morose_plugin_setup)
 
 #[[
@@ -421,4 +412,21 @@ function(morose_add_environment_config_file)
     add_custom_command(TARGET ${CONF_TARGET} POST_BUILD ${CONF_FILE_STRING})
 endfunction(morose_add_environment_config_file)
 
+#[[
+    添加子目录的路径, 该函数会遍历目录下所有的文件夹, 如果存在CMakeLists.txt则添加至子目录的构建目录
+    `morose_add_subdirectory_path(path)`
+    `path`: 子目录路径
+]]
+function(morose_add_subdirectory_path path)
+    file(GLOB SUBPATH "${path}/*")
+    foreach(ITEM ${SUBPATH})
+        if (IS_DIRECTORY "${ITEM}" AND EXISTS "${ITEM}/CMakeLists.txt")
+            file(RELATIVE_PATH ITEM_PATH ${CMAKE_CURRENT_SOURCE_DIR} ${ITEM})
+            add_subdirectory(${ITEM_PATH})
+        endif(IS_DIRECTORY "${ITEM}" AND EXISTS "${ITEM}/CMakeLists.txt")
+    endforeach(ITEM ${ITEM_PATH})
+endfunction(morose_add_subdirectory_path path)
+
 set(Morose_FOUND TRUE)
+morose_main_setup()
+morose_add_subdirectory_path("extensions")

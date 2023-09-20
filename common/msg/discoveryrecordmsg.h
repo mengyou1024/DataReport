@@ -76,22 +76,21 @@ namespace Ruitie {
             }
             setDefectEchoRecord(shared_ptr<defectRecordModel[]>(new defectRecordModel[getDefectsNum()]));
             setBottomWaveAttenuationRecord(shared_ptr<defectRecordModel[]>(new defectRecordModel[getDefectsNum()]));
-
-            for (uint32_t ch = 0; ch < HD_CHANNEL_NUM; ch++) {
-                for (uint32_t i = 0; i < recDataPtr->m_pDefect[i].size(); i++) {
+            for (uint32_t ch = 0, idx = 0; ch < HD_CHANNEL_NUM; ch++) {
+                for (uint32_t i = 0; i < recDataPtr->m_pDefect[ch].size(); i++, idx++) {
                     // 缺陷回波记录
-                    defectEchoRecord[i].axial      = recDataPtr->m_pDefect[ch][i]->nAxialDepth;
-                    defectEchoRecord[i].radial     = recDataPtr->m_pDefect[ch][i]->nRadialDistance;
-                    defectEchoRecord[i].gain       = recDataPtr->m_pDefect[ch][i]->nParam1; // TODO: 获取增益
-                    defectEchoRecord[i].waveHeight = recDataPtr->m_pDefect[ch][i]->nWaveHeight;
-                    defectEchoRecord[i].dBDiff     = recDataPtr->m_pDefect[ch][i]->nDBOffset;
+                    defectEchoRecord[idx].axial      = recDataPtr->m_pDefect[ch][i]->nAxialDepth;
+                    defectEchoRecord[idx].radial     = recDataPtr->m_pDefect[ch][i]->nRadialDistance;
+                    defectEchoRecord[idx].gain       = recDataPtr->m_pDefect[ch][i]->nParam1; // TODO: 获取增益
+                    defectEchoRecord[idx].waveHeight = recDataPtr->m_pDefect[ch][i]->nWaveHeight;
+                    defectEchoRecord[idx].dBDiff     = recDataPtr->m_pDefect[ch][i]->nDBOffset;
 
                     // 底波衰减记录
-                    bottomWaveAttenuationRecord[i].axial      = recDataPtr->m_pDefect[ch][i]->nAxialDepth;
-                    bottomWaveAttenuationRecord[i].radial     = recDataPtr->m_pDefect[ch][i]->nRadialDistance;
-                    bottomWaveAttenuationRecord[i].gain       = recDataPtr->m_pDefect[ch][i]->nParam1; // TODO: 获取增益
-                    bottomWaveAttenuationRecord[i].waveHeight = recDataPtr->m_pDefect[ch][i]->nWaveHeight;
-                    bottomWaveAttenuationRecord[i].dBDiff     = recDataPtr->m_pDefect[ch][i]->nDBOffset;
+                    bottomWaveAttenuationRecord[idx].axial      = recDataPtr->m_pDefect[ch][i]->nAxialDepth;
+                    bottomWaveAttenuationRecord[idx].radial     = recDataPtr->m_pDefect[ch][i]->nRadialDistance;
+                    bottomWaveAttenuationRecord[idx].gain       = recDataPtr->m_pDefect[ch][i]->nParam1; // TODO: 获取增益
+                    bottomWaveAttenuationRecord[idx].waveHeight = recDataPtr->m_pDefect[ch][i]->nWaveHeight;
+                    bottomWaveAttenuationRecord[idx].dBDiff     = recDataPtr->m_pDefect[ch][i]->nDBOffset;
                 }
             }
 

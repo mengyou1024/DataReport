@@ -76,13 +76,13 @@ namespace Ruitie {
             }
             setDefectsPtr(shared_ptr<defectRecordModel[]>(new defectRecordModel[getDefectsNum()]));
 
-            for (uint32_t ch = 0; ch < HD_CHANNEL_NUM; ch++) {
-                for (uint32_t i = 0; i < recDataPtr->m_pDefect[i].size(); i++) {
-                    defectsPtr[i].axial      = recDataPtr->m_pDefect[ch][i]->nAxialDepth;
-                    defectsPtr[i].radial     = recDataPtr->m_pDefect[ch][i]->nRadialDistance;
-                    defectsPtr[i].gain       = recDataPtr->m_pDefect[ch][i]->nParam1; // TODO: 获取增益
-                    defectsPtr[i].waveHeight = recDataPtr->m_pDefect[ch][i]->nWaveHeight;
-                    defectsPtr[i].dBDiff     = recDataPtr->m_pDefect[ch][i]->nDBOffset;
+            for (uint32_t ch = 0, idx = 0; ch < HD_CHANNEL_NUM; ch++) {
+                for (uint32_t i = 0; i < recDataPtr->m_pDefect[ch].size(); i++, idx++) {
+                    defectsPtr[idx].axial      = recDataPtr->m_pDefect[ch][i]->nAxialDepth;
+                    defectsPtr[idx].radial     = recDataPtr->m_pDefect[ch][i]->nRadialDistance;
+                    defectsPtr[idx].gain       = recDataPtr->m_pDefect[ch][i]->nParam1; // TODO: 获取增益
+                    defectsPtr[idx].waveHeight = recDataPtr->m_pDefect[ch][i]->nWaveHeight;
+                    defectsPtr[idx].dBDiff     = recDataPtr->m_pDefect[ch][i]->nDBOffset;
                 }
             }
 

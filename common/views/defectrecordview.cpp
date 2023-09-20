@@ -27,11 +27,11 @@ namespace Ruitie {
         } else {
             switch (index.column()) {
                 case 0: return index.row() - 1;
-                case 1: return datptr[index.row() - 1].axial;
-                case 2: return datptr[index.row() - 1].radial;
-                case 3: return datptr[index.row() - 1].gain;
-                case 4: return datptr[index.row() - 1].waveHeight;
-                case 5: return datptr[index.row() - 1].dBDiff;
+                case 1: return QString::number(datptr[index.row() - 1].axial, 'f', 1);
+                case 2: return QString::number(datptr[index.row() - 1].radial, 'f', 1);
+                case 3: return QString::number(datptr[index.row() - 1].gain, 'f', 1);
+                case 4: return QString::number(datptr[index.row() - 1].waveHeight, 'f', 1);
+                case 5: return QString::number(datptr[index.row() - 1].dBDiff, 'f', 1);
                 default: break;
             }
         }

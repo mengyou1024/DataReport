@@ -76,18 +76,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 find_package(Morose)
 
 if (Morose_FOUND)
-    morose_main_setup()
-    # 添加qml_dirs用于windeployqt部署
     morose_add_qml_dirs("resource/qml")
-#    morose_copy(
-#        TARGET ${PROJECT_NAME}
-#        FILES "script/Upgrade.exe"
-#        DIRS "template"
-#    )
     morose_copy(
         DIRS "templates/log"
     )
-
     if((NOT EXISTS "${CMAKE_SOURCE_DIR}/config/ProductConfig.json") AND (NOT CMAKE_BUILD_TYPE STREQUAL "Release"))
         message(FATAL_ERROR "no ProductConfig.json file please see ${CMAKE_SOURCE_DIR}/config/ProductConfigTemplate.json")
     endif((NOT EXISTS "${CMAKE_SOURCE_DIR}/config/ProductConfig.json") AND (NOT CMAKE_BUILD_TYPE STREQUAL "Release"))
