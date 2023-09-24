@@ -50,7 +50,7 @@ jobs:
         modules: 'qt5compat qtmultimedia qtshadertools qtimageformats'
     # 配置、编译程序
     - name: CMake Config
-      run: cmake -B build -DCMAKE_PREFIX_PATH="${GITHUB_WORKSPACE}/example/Qt/6.4.3/mingw_64" -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+      run: cmake -B build -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" -G "Ninja"  -DCMAKE_BUILD_TYPE=Release
     - name: CMake Build
       run: cmake --build build --target generate_exe_installer --config Release
     # 打包输出文件
