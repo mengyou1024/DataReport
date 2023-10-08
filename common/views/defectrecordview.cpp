@@ -30,7 +30,7 @@ namespace Ruitie {
                 case 1: return QString::number(datptr[index.row() - 1].axial, 'f', 1);
                 case 2: return QString::number(datptr[index.row() - 1].radial, 'f', 1);
                 case 3: return QString::number(datptr[index.row() - 1].gain, 'f', 1);
-                case 4: return QString::number(datptr[index.row() - 1].waveHeight, 'f', 1);
+                case 4: return QString::number(datptr[index.row() - 1].waveHeight / (qreal)(2.55), 'f', 1);
                 case 5: return QString::number(datptr[index.row() - 1].dBDiff, 'f', 1);
                 default: break;
             }

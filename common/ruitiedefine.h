@@ -114,12 +114,12 @@ namespace Ruitie {
 
     // 人员信息
     struct DB_USER_DATA {
-        long  lSerial;       ///< 自动编号
-        TCHAR strName[20];   ///< 检测人员
-        TCHAR strNumber[20]; ///< 工号
-        TCHAR strPwd[10];    ///< 密码
-        long  lLevel;        ///< 权限
-        TCHAR strRemark[40]; ///< 备注
+        long  lSerial;       // 自动编号
+        TCHAR strName[21];   // 检测人员
+        TCHAR strNumber[21]; // 工号
+        TCHAR strPwd[21];    // 密码
+        long  lLevel;        // 权限
+        TCHAR strRemark[41]; // 备注
     };
 
     // 数据记录

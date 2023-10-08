@@ -52,7 +52,7 @@ bool Ruitie::saveFile(QString &fileName, DailyRecordMsg *ptr) {
         doc.ExcelFill(ptr->defectsPtr[i].axial);
         doc.ExcelFill(ptr->defectsPtr[i].radial);
         doc.ExcelFill(ptr->defectsPtr[i].gain);
-        doc.ExcelFill(ptr->defectsPtr[i].waveHeight);
+        doc.ExcelFill(ptr->defectsPtr[i].waveHeight / (qreal)(2.55));
         doc.ExcelFill(ptr->defectsPtr[i].dBDiff);
         doc.ExcelNextRow();
     }

@@ -48,7 +48,7 @@ bool Ruitie::saveFile(QString &fileName, DiscoveryRecordMsg *ptr) {
         doc.ExcelFill(ptr->defectEchoRecord[i].axial);
         doc.ExcelFill(ptr->defectEchoRecord[i].radial);
         doc.ExcelFill(ptr->defectEchoRecord[i].gain);
-        doc.ExcelFill(ptr->defectEchoRecord[i].waveHeight);
+        doc.ExcelFill(ptr->defectEchoRecord[i].waveHeight / (qreal)(2.55));
         doc.ExcelFill(ptr->defectEchoRecord[i].dBDiff);
         doc.ExcelNextRow();
     }
@@ -67,7 +67,7 @@ bool Ruitie::saveFile(QString &fileName, DiscoveryRecordMsg *ptr) {
         doc.ExcelFill(ptr->bottomWaveAttenuationRecord[i].axial);
         doc.ExcelFill(ptr->bottomWaveAttenuationRecord[i].radial);
         doc.ExcelFill(ptr->bottomWaveAttenuationRecord[i].gain);
-        doc.ExcelFill(ptr->bottomWaveAttenuationRecord[i].waveHeight);
+        doc.ExcelFill(ptr->bottomWaveAttenuationRecord[i].waveHeight / (qreal)(2.55));
         doc.ExcelFill(ptr->bottomWaveAttenuationRecord[i].dBDiff);
     }
     doc.ExcelNextRow(0, 35.25);

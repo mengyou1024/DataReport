@@ -142,6 +142,10 @@ namespace Ruitie {
             cursor.setY(cursor.y() + columnSpan);
         }
 
+        void ExcelFill(qreal label) {
+            return ExcelFill(QString::number(label, 'f', 1));
+        }
+
         template <typename contentT>
         void ExcelFill(QString label, contentT content, int ctx_columnSpan = 1, int ctx_rowSpan = 1, int lb_columnSpan = 1,
                        int lb_rowSpan = 1) {
