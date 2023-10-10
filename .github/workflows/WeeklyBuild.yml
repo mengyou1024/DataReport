@@ -48,9 +48,15 @@ jobs:
         arch: ${{ matrix.qt_arch }}
         cache: ${{steps.cache-qt.outputs.cache-hit}}
         modules: 'qt5compat qtmultimedia qtshadertools qtimageformats'
+    # 删除之前发布的版本
+    - uses: dev-drprasad/delete-tag-and-release@v1.0 
+      with:
+        tag_name: weekly 
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        delete_release: true 
     # 配置、编译程序
     - name: CMake Config
-      run: cmake -B build -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" -G "Ninja"  -DCMAKE_BUILD_TYPE=Release
+      run: cmake -B build -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" -G "Unix Makefiles"  -DCMAKE_BUILD_TYPE=Release
     - name: CMake Build
       run: cmake --build build --target generate_exe_installer --config Release
     # 打包输出文件
@@ -61,12 +67,6 @@ jobs:
         7z a -tZip ${{ matrix.app_name }}.zip ./${{ matrix.app_name }}/*
         cp ${{ matrix.app_name }}.zip ../${{ matrix.app_name }}.zip
         popd
-    # 删除之前发布的版本
-    - uses: dev-drprasad/delete-tag-and-release@v1.0 
-      with:
-        tag_name: weekly 
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        delete_release: true 
     # 更新发布release
     - name: Update Weekly Release
       uses: andelf/nightly-release@main
