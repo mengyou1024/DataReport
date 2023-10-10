@@ -253,7 +253,7 @@ ColumnLayout {
         anchors.centerIn: parent
         id: root_filleSelect
         rootDir: dataDir
-        dirType: "Scan"
+        dirType: "Daily"
         onAccepted: {
             if(!root_msg.loadFile(filePath)) {
                 showError("打开文件失败!")

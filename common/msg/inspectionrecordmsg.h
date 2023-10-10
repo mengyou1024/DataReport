@@ -61,16 +61,18 @@ namespace Ruitie {
             }
 
             // 解析数据
-            setCompanyName(QString::fromStdWString(L""));
-            setDetectDate(QDateTime::currentDateTime().toString("yyyy-M-d")); // TODO: valid type
-            setDeviceName(QString("TODO:deviceName"));                        // TODO: devicename
-            setDeviceType(QString::fromStdWString(L""));
-            setDeviceSerial(QString::fromStdWString(L""));
-            setDetectStandard(QString("TODO")); // TODO: 探伤标准
-            setDetectContent(QString("TODO"));  // TODO: 探伤内容
-            setDetectRegion(QString::fromStdWString(L""));
-            setProbe(QString::fromStdWString(L""));
-            setSoundSpeed(0); // TODO: valid type crash
+            setCompanyName(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionFact));
+            setDetectDate(QDateTime::currentDateTime().toString("yyyy-M-d")); // TODO: 时间保存位置
+            setDeviceName(QString::fromWCharArray(recDataPtr->wheelParam.szDeviceName));
+            setDeviceType(QString::fromWCharArray(L""));                      // TODO: 设备型号保存位置
+            setDeviceSerial(QString::fromWCharArray(L""));                    // TODO: 设备编号保存位置
+            setDetectStandard(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionStd));
+            setDetectContent(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionContent));
+            setDetectRegion(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionArea));
+            setProbe(QString::fromWCharArray(L""));                 // TODO: 探头
+            setSoundSpeed(recDataPtr->paramChannel[0].m_iVelocity); // TODO: valid type crash // TODO: 声速
+
+            // TODO: 读取探伤数据
             setRecordNum(0);
 
             // setRecordPtr(shared_ptr<InspectionRecordModel[]>(new InspectionRecordModel[recordNum]));

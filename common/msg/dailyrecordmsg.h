@@ -60,15 +60,15 @@ namespace Ruitie {
             }
 
             // 解析数据
-            setCompanyName(QString::fromStdWString(L"江苏瑞铁轨道装备股份有限公司"));
-            setDetectDate(QDateTime::currentDateTime().toString("yyyy-M-d"));
-            setDetectDeive(QString::fromStdWString(L"(水浸)车轮超声波探伤机"));
+            setCompanyName(QString::fromStdWString(recDataPtr->wheelParam.szDetectionFact));
+            setDetectDate(QDateTime::currentDateTime().toString("yyyy-M-d")); // TODO: 时间保存位置
+            setDetectDeive(QString::fromStdWString(recDataPtr->wheelParam.szDeviceName));
             setWorkFreq(2.5);
-            setProbe(QString::fromStdWString(L"探头"));
-            setCoupledMode(QString::fromStdWString(L"水浸"));
-            setWheelType(QString::fromStdWString(L"车轮类型"));
-            setHeatSerial(QString::fromStdWString(L"炉号"));
-            setWheelSerial(QString::fromStdWString(L"车轮编号"));
+            setProbe(QString::fromStdWString(L"探头"));       // TODO: 探头保存位置
+            setCoupledMode(QString::fromStdWString(L"水浸")); // TODO: 探头类型保存位置
+            setWheelType(QString::fromStdWString(recDataPtr->wheelParam.szWheelType));
+            setHeatSerial(QString::fromStdWString(recDataPtr->wheelParam.szHeatNumber));
+            setWheelSerial(QString::fromStdWString(recDataPtr->wheelParam.szWheelNumber));
 
             // 填充缺陷数据
             for (uint32_t i = 0; i < HD_CHANNEL_NUM; i++) {

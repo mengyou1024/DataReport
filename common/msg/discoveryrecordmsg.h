@@ -60,14 +60,14 @@ namespace Ruitie {
                 return false;
             }
             // 解析数据
-            setCompanyName(QString::fromStdWString(L""));
-            setDetectDate(QDateTime::currentDateTime().toString("yyyy-M-d")); // TODO: valid type
-            setWorkFreq(0);
-            setProbe(QString::fromStdWString(L""));
-            setCoupledMode(QString::fromStdWString(L""));
-            setWheelType(QString::fromStdWString(L""));
-            setHeatSerial(QString::fromStdWString(L""));
-            setWheelSerial(QString::fromStdWString(L""));
+            setCompanyName(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionFact));
+            setDetectDate(QDateTime::currentDateTime().toString("yyyy-M-d")); // TODO: 时间保存位置
+            setWorkFreq(0);                                                   // TODO: 探头频率保存位置
+            setProbe(QString::fromWCharArray(L""));                           // TODO: 探头保存位置
+            setCoupledMode(QString::fromWCharArray(L"水浸"));                 // TODO: 耦合方式
+            setWheelType(QString::fromWCharArray(recDataPtr->wheelParam.szWheelType));
+            setHeatSerial(QString::fromWCharArray(recDataPtr->wheelParam.szHeatNumber));
+            setWheelSerial(QString::fromWCharArray(recDataPtr->wheelParam.szWheelNumber));
             setDefectsNum(0);
 
             // 填充缺陷数据
@@ -85,7 +85,7 @@ namespace Ruitie {
                     defectEchoRecord[idx].waveHeight = recDataPtr->m_pDefect[ch][i]->nWaveHeight;
                     defectEchoRecord[idx].dBDiff     = recDataPtr->m_pDefect[ch][i]->nDBOffset;
 
-                    // 底波衰减记录
+                    // TODO: 底波衰减记录
                     bottomWaveAttenuationRecord[idx].axial      = recDataPtr->m_pDefect[ch][i]->nAxialDepth;
                     bottomWaveAttenuationRecord[idx].radial     = recDataPtr->m_pDefect[ch][i]->nRadialDistance;
                     bottomWaveAttenuationRecord[idx].gain       = recDataPtr->m_pDefect[ch][i]->nParam1; // TODO: 获取增益

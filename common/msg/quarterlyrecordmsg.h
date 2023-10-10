@@ -65,11 +65,11 @@ namespace Ruitie {
                 probeSerial[i] = QString::number(0);
             }
             for (int i = 0; i < 10; i++) {
-                performance[i][0] = QString::number(quartData.m_nSensitivityMargin[i]);
-                performance[i][1] = QString::number(quartData.m_nDistinguishValuel[i]);
-                performance[i][2] = QString::number(quartData.m_nHorLinearity[i]);
-                performance[i][3] = QString::number(quartData.m_nVerLinearity[i]);
-                performance[i][4] = QString::number(quartData.m_nDynamicRange[i]);
+                performance[i][0] = QString::number(quartData.m_nSensitivityMargin[i], 'f', 1);
+                performance[i][1] = QString::number(quartData.m_nDistinguishValuel[i], 'f', 1);
+                performance[i][2] = QString::number(quartData.m_nHorLinearity[i], 'f', 1);
+                performance[i][3] = QString::number(quartData.m_nVerLinearity[i], 'f', 1);
+                performance[i][4] = QString::number(quartData.m_nDynamicRange[i], 'f', 1);
             }
             return true;
         }
