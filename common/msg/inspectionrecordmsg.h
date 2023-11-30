@@ -2,6 +2,8 @@
 
 #include "../ruitie.h"
 #include "../ruitiedefine.h"
+#include <QDir>
+#include <QRegularExpression>
 
 namespace Ruitie {
     /**
@@ -54,42 +56,80 @@ namespace Ruitie {
         Q_INVOKABLE bool saveFile(QString fileName) {
             return Ruitie::saveFile(fileName, this);
         }
-        Q_INVOKABLE bool loadFile(QString fileName) {
-            auto recDataPtr = DataLoader::getRecData(fileName);
-            if (recDataPtr == nullptr) {
+        Q_INVOKABLE bool loadFile([[maybe_unused]] QString fileName) {
+            QDir dir(fileName);
+            if (!dir.exists()) {
                 return false;
             }
 
-            // 解析数据
-            setCompanyName(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionFact));
-            setDetectDate(QDateTime::currentDateTime().toString("yyyy-M-d")); // TODO: 时间保存位置
-            setDeviceName(QString::fromWCharArray(recDataPtr->wheelParam.szDeviceName));
-            setDeviceType(QString::fromWCharArray(L""));                      // TODO: 设备型号保存位置
-            setDeviceSerial(QString::fromWCharArray(L""));                    // TODO: 设备编号保存位置
-            setDetectStandard(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionStd));
-            setDetectContent(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionContent));
-            setDetectRegion(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionArea));
-            setProbe(QString::fromWCharArray(L""));                 // TODO: 探头
-            setSoundSpeed(recDataPtr->paramChannel[0].m_iVelocity); // TODO: valid type crash // TODO: 声速
+            shared_ptr<RecData> lastDataPtr = nullptr;
+            dir.setFilter(QDir::Files | QDir::NoSymLinks);
+            QFileInfoList list = dir.entryInfoList();
+            setRecordNum(list.size());
+            setRecordPtr(shared_ptr<InspectionRecordModel[]>(new InspectionRecordModel[recordNum]));
+            int index = 0;
+            for (const auto &file : list) {
+                qInfo() << file.fileName();
+                QString ffN        = fileName + "/" + file.fileName();
+                auto    recDataPtr = DataLoader::getRecData(ffN);
+                lastDataPtr        = recDataPtr;
+                int defectsNum     = 0;
 
-            // TODO: 读取探伤数据
-            setRecordNum(0);
+                qreal   radial      = 0.0;
+                qreal   axial       = 0.0;
+                qreal   waveHeight  = 0.0;
+                qreal   dbDiff      = 0.0;
+                QString result      = "";
+                qreal   sensitivity = 0.0;
 
-            // setRecordPtr(shared_ptr<InspectionRecordModel[]>(new InspectionRecordModel[recordNum]));
+                for (uint32_t ch = 0, idx = 0; ch < HD_CHANNEL_NUM; ch++) {
+                    defectsNum += recDataPtr->m_pDefect[ch].size();
+                    for (uint32_t i = 0; i < recDataPtr->m_pDefect[ch].size(); i++, idx++) {
+                        if (recDataPtr->m_pDefect[ch][i]->nDBOffset > dbDiff) {
+                            radial      = recDataPtr->m_pDefect[ch][i]->nRadialDistance;
+                            axial       = recDataPtr->m_pDefect[ch][i]->nAxialDepth;
+                            waveHeight  = recDataPtr->m_pDefect[ch][i]->nWaveHeight / 2.55;
+                            dbDiff      = recDataPtr->m_pDefect[ch][i]->nDBOffset;
+                            result      = recDataPtr->m_pDefect[ch][i]->bDefectType ? "透声不良" : "缺陷";
+                            sensitivity = recDataPtr->m_pDefect[ch][i]->nSensitivity;
+                        }
+                    }
+                }
 
-            // for (int i = 0; i < recordNum; i++) {
-            //     recordPtr[i].wheelType   = QString("TODO: wheelType");                            // TODO: wheelType
-            //     recordPtr[i].heatSerial  = QString("TODO: heatSerial");                           // TODO: heatSerial
-            //     recordPtr[i].wheelSerial = QString::fromStdWString(nDbScanData[i].szWheelNumber); // TODO: wheelSerial
-            //     recordPtr[i].defectsNum  = nDbScanData[i].nTotalDefectNum;
-            //     recordPtr[i].radial      = dbDefectData[i].nRadialDistance;
-            //     recordPtr[i].axial       = dbDefectData[i].nAxialDepth;
-            //     recordPtr[i].waveHeight  = dbDefectData[i].nWaveHeight;
-            //     recordPtr[i].dBDiff      = dbDefectData[i].nDBOffset;
-            //     recordPtr[i].result      = QString("TODO: result"); // TODO: result
-            //     recordPtr[i].sensitivity = dbDefectData[i].nSensitivity;
-            // }
+                recordPtr[index].wheelType   = QString::fromStdWString(recDataPtr->wheelParam.szWheelType);
+                recordPtr[index].heatSerial  = QString::fromStdWString(recDataPtr->wheelParam.szHeatNumber);
+                recordPtr[index].wheelSerial = QString::fromStdWString(recDataPtr->wheelParam.szWheelNumber);
+                recordPtr[index].defectsNum  = defectsNum;
+                recordPtr[index].radial      = radial;
+                recordPtr[index].axial       = axial;
+                recordPtr[index].waveHeight  = waveHeight;
+                recordPtr[index].dBDiff      = dbDiff;
+                recordPtr[index].result      = result; // TODO: result
+                recordPtr[index].sensitivity = sensitivity;
 
+                index++;
+            }
+
+            const static QRegularExpression rexp(R"(^.*/(\d{4})(\d+)/(\d+)/$)");
+            auto                            match    = rexp.match(fileName);
+            QDateTime                       dateTime = QDateTime::currentDateTime();
+            if (match.hasMatch()) {
+                auto dataStr = QString("%1-%2-%3").arg(match.captured(1), match.captured(2), match.captured(3));
+                dateTime     = QDateTime::fromString(dataStr, "yyyy-M-d");
+            }
+            if (lastDataPtr != nullptr) {
+                auto recDataPtr = lastDataPtr;
+                setCompanyName(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionFact));
+                setDetectDate(dateTime.toString("yyyy-M-d"));
+                setDeviceName(QString::fromWCharArray(recDataPtr->wheelParam.szDeviceName));
+                setDeviceType(QString::fromWCharArray(L""));   // TODO: 设备型号保存位置
+                setDeviceSerial(QString::fromWCharArray(L"")); // TODO: 设备编号保存位置
+                setDetectStandard(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionStd));
+                setDetectContent(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionContent));
+                setDetectRegion(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionArea));
+                setProbe(QString::fromWCharArray(L"")); // TODO: 探头
+                setSoundSpeed(recDataPtr->paramChannel[0].m_iVelocity);
+            }
             return true;
         }
 

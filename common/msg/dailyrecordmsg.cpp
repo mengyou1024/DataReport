@@ -15,7 +15,7 @@ bool Ruitie::saveFile(QString &fileName, DailyRecordMsg *ptr) {
 
     ExcelRender doc;
 
-    doc.initColumnWidth({8.38, 12.88, 13.88, 12.88, 18.75, 22.25});
+    doc.initColumnWidth({8, 8, 8, 10, 16, 20});
     doc.ExcelTableHead("车轮超声波自动探伤机日常性能检查记录表");
     doc.ExcelNextRow();
     doc.ExcelFill("单位名称:", ptr->companyName, 3, 1, 2, 1);

@@ -10,6 +10,7 @@ ColumnLayout {
     id: root_layout
     Layout.preferredHeight: parent.height
     Layout.preferredWidth: parent.width
+    property string filePrefix: "Daily"
     DailyRecordMsg {
         id: root_msg
         onDetectDateChanged: {
@@ -221,6 +222,7 @@ ColumnLayout {
 
             TableView {
                 clip: true
+                boundsBehavior: Flickable.OvershootBounds
                 model: DefectRecordView {
                     id: root_model
                     datNum: root_msg.recordNum
@@ -253,8 +255,9 @@ ColumnLayout {
         anchors.centerIn: parent
         id: root_filleSelect
         rootDir: dataDir
-        dirType: "Daily"
+        dirType: filePrefix
         onAccepted: {
+            console.info(filePath)
             if(!root_msg.loadFile(filePath)) {
                 showError("打开文件失败!")
             } else {

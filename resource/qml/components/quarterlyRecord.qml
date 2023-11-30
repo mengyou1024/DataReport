@@ -8,6 +8,7 @@ import mengyou.Model
 
 ColumnLayout {
     id: root_layout
+    property string filePrefix: "QuartPerformance"
     Layout.preferredHeight: parent.height
     Layout.preferredWidth: parent.width
     QuarterlyRecordMsg {
@@ -220,6 +221,7 @@ ColumnLayout {
 
             TableView {
                 clip: true
+                boundsBehavior: Flickable.OvershootBounds
                 model: PerformanceRecordView {
                     id: root_model
                     performanceRecordPtr: root_msg
@@ -248,7 +250,7 @@ ColumnLayout {
         anchors.centerIn: parent
         id: root_filleSelect
         rootDir: dataDir
-        dirType: "QuartPerformance"
+        dirType: filePrefix
         onAccepted: {
             if(!root_msg.loadFile(filePath)) {
                 showError("打开文件失败!")

@@ -68,25 +68,25 @@ TextField{
         acceptedButtons: Qt.RightButton
         onClicked: control.echoMode !== TextInput.Password && menu.popup()
     }
-    FluIconButton{
-        iconSource:FluentIcons.ChromeClose
-        iconSize: 10
-        width: 20
-        height: 20
-        visible: {
-            if(control.readOnly)
-                return false
-            return control.text !== ""
-        }
-        anchors{
-            verticalCenter: parent.verticalCenter
-            right: parent.right
-            rightMargin: closeRightMargin
-        }
-        onClicked:{
-            control.text = ""
-        }
-    }
+//    FluIconButton{
+//        iconSource:FluentIcons.ChromeClose
+//        iconSize: 10
+//        width: 20
+//        height: 20
+//        visible: {
+//            if(control.readOnly)
+//                return false
+//            return control.text !== ""
+//        }
+//        anchors{
+//            verticalCenter: parent.verticalCenter
+//            right: parent.right
+//            rightMargin: closeRightMargin
+//        }
+//        onClicked:{
+//            control.text = ""
+//        }
+//    }
     FluTextBoxMenu{
         id:menu
         inputItem: control

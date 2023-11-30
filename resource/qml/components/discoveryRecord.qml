@@ -10,6 +10,7 @@ ColumnLayout {
     id: root_layout
     Layout.preferredHeight: parent.height
     Layout.preferredWidth: parent.width
+    property string filePrefix: "Scan"
     DiscoveryRecordMsg {
         id: root_msg
         onDetectDateChanged: {
@@ -234,6 +235,7 @@ ColumnLayout {
                 }
                 TableView {
                     clip: true
+                    boundsBehavior: Flickable.OvershootBounds
                     model: DefectRecordView {
                         id: der_table
                         datNum: root_msg.defectsNum
@@ -283,7 +285,7 @@ ColumnLayout {
                     clip: true
                     model: DefectRecordView {
                         id: bwar_table
-                        datNum: root_msg.defectsNum
+                        datNum: root_msg.bottomNum
                         datptr: root_msg.bottomWaveAttenuationRecord
                     }
                     delegate: Rectangle {
@@ -305,7 +307,7 @@ ColumnLayout {
         der_table.datptr = root_msg.defectEchoRecord
         der_table.datNum = root_msg.defectsNum
         bwar_table.datptr = root_msg.bottomWaveAttenuationRecord
-        bwar_table.datNum = root_msg.defectsNum
+        bwar_table.datNum = root_msg.bottomNum
         der_table.resetModel()
         bwar_table.resetModel()
     }
@@ -316,7 +318,7 @@ ColumnLayout {
         anchors.centerIn: parent
         id: root_filleSelect
         rootDir: dataDir
-        dirType: "Scan"
+        dirType: filePrefix
         onAccepted: {
             if(!root_msg.loadFile(filePath)) {
                 showError("打开文件失败!")

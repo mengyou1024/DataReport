@@ -56,8 +56,8 @@ namespace Ruitie {
             // 解析数据
             setCompanyName(QString::fromStdWString(L"江苏瑞铁轨道装备股份有限公司"));
             setPrintDate(QDateTime::currentDateTime().toString("yyyy-M-d"));
-            setInstrumentType(QString::fromStdWString(L""));
-            setInstrumentSerial(QString::fromStdWString(L""));
+            setInstrumentType(QString::fromStdWString(L""));   // TODO: 仪器型号
+            setInstrumentSerial(QString::fromStdWString(L"")); // TODO: 仪器编号
             setManufactureCompany(QString::fromStdWString(L"江苏瑞铁轨道装备股份有限公司"));
             setManufactureDate(QString(quartData.m_dtTime));
             for (int i = 0; i < 5; i++) {

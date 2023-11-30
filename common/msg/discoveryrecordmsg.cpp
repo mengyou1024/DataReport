@@ -14,7 +14,7 @@ bool Ruitie::saveFile(QString &fileName, DiscoveryRecordMsg *ptr) {
     }
     ExcelRender doc;
 
-    doc.initColumnWidth({8.38, 13.88, 11.0, 11.88, 18.88, 15.63});
+    doc.initColumnWidth({9, 9, 12, 12, 12, 12});
     doc.ExcelTableHead("车轮超声波探伤发现记录表");
     doc.ExcelNextRow();
     doc.ExcelFill("单位名称:", ptr->companyName, 3);
@@ -32,7 +32,7 @@ bool Ruitie::saveFile(QString &fileName, DiscoveryRecordMsg *ptr) {
     doc.ExcelFill("车轮编号:", ptr->wheelSerial);
     doc.ExcelFill("炉号:", ptr->heatSerial);
     doc.ExcelNextRow();
-    doc.ExcelFill("缺陷数目:", QString("共 %1 处").arg(ptr->defectsNum), 4, 1, 2, 1);
+    doc.ExcelFill("缺陷数目:", QString("共 %1 处").arg(ptr->defectsNum + ptr->bottomNum), 4, 1, 2, 1);
     doc.ExcelNextRow();
     doc.ExcelFill("缺陷回波记录", 6);
     doc.ExcelNextRow();
@@ -61,7 +61,7 @@ bool Ruitie::saveFile(QString &fileName, DiscoveryRecordMsg *ptr) {
         doc.ExcelFill(it);
     }
 
-    for (int i = 0; i < ptr->defectsNum; i++) {
+    for (int i = 0; i < ptr->bottomNum; i++) {
         doc.ExcelNextRow();
         doc.ExcelFill(i + 1);
         doc.ExcelFill(ptr->bottomWaveAttenuationRecord[i].axial);
@@ -211,4 +211,16 @@ namespace Ruitie {
         companyName = newCompanyName;
         emit companyNameChanged();
     }
+
+    int DiscoveryRecordMsg::getBottomNum() const {
+        return bottomNum;
+    }
+
+    void DiscoveryRecordMsg::setBottomNum(int newBottomNum) {
+        if (bottomNum == newBottomNum)
+            return;
+        bottomNum = newBottomNum;
+        emit bottomNumChanged();
+    }
+
 } // namespace Ruitie

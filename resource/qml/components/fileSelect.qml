@@ -10,6 +10,7 @@ Dialog {
     property string rootDir: ""
     property string dirType: ""
     property string filePath: ""
+    property bool showFile: true
     modal: true
     closePolicy: Popup.CloseOnEscape
     T.Overlay.modal: Rectangle {
@@ -46,7 +47,7 @@ Dialog {
         anchors.margins: 20
         ColumnLayout {
             GridLayout {
-                columns: 3
+                columns: showFile?3:2
                 Text {
                     text: qsTr("年/月")
                     font.pixelSize: 14
@@ -56,6 +57,7 @@ Dialog {
                     font.pixelSize: 14
                 }
                 Text {
+                    visible: showFile
                     text: qsTr("时间")
                     font.pixelSize: 14
                 }
@@ -74,6 +76,7 @@ Dialog {
                     }
                 }
                 FolderComboBox {
+                    visible: showFile
                     implicitWidth: 240
                     showFiles: true
                     showDirs: false
@@ -98,7 +101,11 @@ Dialog {
                         color: parent.hovered ? parent.hoverColor : parent.normalColor
                     }
                     onClicked: {
-                        filePath = String(folder_time.folder + "/" + folder_time.currentText).substring(8)
+                        if (showFile) {
+                            filePath = String(folder_time.folder + "/" +folder_time.currentText).substring(8)
+                        } else {
+                            filePath = String(folder_time.folder + "/").substring(8)
+                        }
                         accept()
                     }
                 }

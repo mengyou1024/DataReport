@@ -8,6 +8,7 @@ import mengyou.Model
 
 ColumnLayout {
     id: root_layout
+    property string filePrefix: "Scan"
     Layout.preferredHeight: parent.height
     Layout.preferredWidth: parent.width
     InspectionRecordMsg {
@@ -248,6 +249,7 @@ ColumnLayout {
                 width: parent.availableWidth
             }
             TableView {
+                boundsBehavior: Flickable.OvershootBounds
                 clip: true
                 model: InspectionRecordView {
                     id: root_model
@@ -275,12 +277,13 @@ ColumnLayout {
     }
 
     FileSelect {
-        width: 560
+        showFile: false
+        width: 320
         height: 160
         anchors.centerIn: parent
         id: root_filleSelect
         rootDir: dataDir
-        dirType: "Scan"
+        dirType: filePrefix
         onAccepted: {
             if(!root_msg.loadFile(filePath)) {
                 showError("打开文件失败!")

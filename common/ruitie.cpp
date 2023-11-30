@@ -113,6 +113,20 @@ bool Ruitie::loadFile(const QString &fileName, RecData &data) {
                     }
                     break;
                 }
+
+                case FK_DATA_PLCSPEED: {
+                    if (dwRead == sizeof(PLC_SPeed_PAPA)) {
+                        file.read((char *)&data.plcSpeedParam, dwRead);
+                    }
+                    break;
+                }
+                case FK_DATA_GROOVESHIELD: {
+                    if (dwRead == sizeof(DETECTION_GROOVE_SHIELD) * HD_CHANNEL_NUM) {
+                        file.read((char *)&data.detectionGroovShield, dwRead);
+                    }
+                    break;
+                }
+
                 case FK_DATA_END: {
                     // 数据结束
                     ret = true;

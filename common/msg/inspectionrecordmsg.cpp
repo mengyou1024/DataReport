@@ -15,7 +15,7 @@ bool Ruitie::saveFile(QString &fileName, InspectionRecordMsg *ptr) {
 
     ExcelRender doc;
 
-    doc.initColumnWidth(12, 11);
+    doc.initColumnWidth(9, 11);
     doc.ExcelTableHead("车轮超声波探伤记录表");
     doc.ExcelNextRow();
     doc.ExcelFill<QString>(QString(), 9);

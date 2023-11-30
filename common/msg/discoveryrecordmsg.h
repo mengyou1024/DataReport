@@ -2,6 +2,7 @@
 
 #include "../ruitie.h"
 #include "../ruitiedefine.h"
+#include <QRegularExpression>
 
 namespace Ruitie {
 
@@ -22,6 +23,7 @@ namespace Ruitie {
         QString     wheelSerial                 = "";      ///< 车轮编号
         QString     heatSerial                  = "";      ///< 炉号
         int         defectsNum                  = 0;       ///< 缺陷数目
+        int         bottomNum                   = 0;       ///< 底波衰减数量
         SP_DefModel defectEchoRecord            = nullptr; ///< 缺陷回波记录
         SP_DefModel bottomWaveAttenuationRecord = nullptr; ///< 底波衰减记录
 
@@ -59,43 +61,69 @@ namespace Ruitie {
             if (recDataPtr == nullptr) {
                 return false;
             }
+            const static QRegularExpression rexp(R"(^.*/(\d{4})(\d+)/(\d+)/[^/]*$)");
+            auto                            match    = rexp.match(fileName);
+            QDateTime                       dateTime = QDateTime::currentDateTime();
+            if (match.hasMatch()) {
+                qInfo() << match.captured(1) << match.captured(2) << match.captured(3);
+                auto dataStr = QString("%1-%2-%3").arg(match.captured(1), match.captured(2), match.captured(3));
+                dateTime     = QDateTime::fromString(dataStr, "yyyy-M-d");
+            }
             // 解析数据
             setCompanyName(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionFact));
-            setDetectDate(QDateTime::currentDateTime().toString("yyyy-M-d")); // TODO: 时间保存位置
-            setWorkFreq(0);                                                   // TODO: 探头频率保存位置
-            setProbe(QString::fromWCharArray(L""));                           // TODO: 探头保存位置
-            setCoupledMode(QString::fromWCharArray(L"水浸"));                 // TODO: 耦合方式
+            setDetectDate(dateTime.toString("yyyy-M-d"));
+            setWorkFreq(0);                                   // TODO: 探头频率保存位置
+            setProbe(QString::fromWCharArray(L""));           // TODO: 探头保存位置
+            setCoupledMode(QString::fromWCharArray(L"水浸")); // TODO: 耦合方式
             setWheelType(QString::fromWCharArray(recDataPtr->wheelParam.szWheelType));
             setHeatSerial(QString::fromWCharArray(recDataPtr->wheelParam.szHeatNumber));
             setWheelSerial(QString::fromWCharArray(recDataPtr->wheelParam.szWheelNumber));
             setDefectsNum(0);
 
+            int _defectsNum = 0;
+            int _bottomNum  = 0;
             // 填充缺陷数据
             for (uint32_t i = 0; i < HD_CHANNEL_NUM; i++) {
-                setDefectsNum(getDefectsNum() + recDataPtr->m_pDefect[i].size());
+                for (const auto &defect : recDataPtr->m_pDefect[i]) {
+                    if (defect->bDefectType == 0) {
+                        _defectsNum += 1;
+                    } else {
+                        _bottomNum += 1;
+                    }
+                }
             }
-            setDefectEchoRecord(shared_ptr<defectRecordModel[]>(new defectRecordModel[getDefectsNum()]));
-            setBottomWaveAttenuationRecord(shared_ptr<defectRecordModel[]>(new defectRecordModel[getDefectsNum()]));
-            for (uint32_t ch = 0, idx = 0; ch < HD_CHANNEL_NUM; ch++) {
-                for (uint32_t i = 0; i < recDataPtr->m_pDefect[ch].size(); i++, idx++) {
-                    // 缺陷回波记录
-                    defectEchoRecord[idx].axial      = recDataPtr->m_pDefect[ch][i]->nAxialDepth;
-                    defectEchoRecord[idx].radial     = recDataPtr->m_pDefect[ch][i]->nRadialDistance;
-                    defectEchoRecord[idx].gain       = recDataPtr->m_pDefect[ch][i]->nParam1; // TODO: 获取增益
-                    defectEchoRecord[idx].waveHeight = recDataPtr->m_pDefect[ch][i]->nWaveHeight;
-                    defectEchoRecord[idx].dBDiff     = recDataPtr->m_pDefect[ch][i]->nDBOffset;
+            setBottomNum(_bottomNum);
+            setDefectsNum(_defectsNum);
 
-                    // TODO: 底波衰减记录
-                    bottomWaveAttenuationRecord[idx].axial      = recDataPtr->m_pDefect[ch][i]->nAxialDepth;
-                    bottomWaveAttenuationRecord[idx].radial     = recDataPtr->m_pDefect[ch][i]->nRadialDistance;
-                    bottomWaveAttenuationRecord[idx].gain       = recDataPtr->m_pDefect[ch][i]->nParam1; // TODO: 获取增益
-                    bottomWaveAttenuationRecord[idx].waveHeight = recDataPtr->m_pDefect[ch][i]->nWaveHeight;
-                    bottomWaveAttenuationRecord[idx].dBDiff     = recDataPtr->m_pDefect[ch][i]->nDBOffset;
+            setDefectEchoRecord(shared_ptr<defectRecordModel[]>(new defectRecordModel[getDefectsNum()]));
+            setBottomWaveAttenuationRecord(shared_ptr<defectRecordModel[]>(new defectRecordModel[getBottomNum()]));
+            for (uint32_t ch = 0, idx_echo = 0, idx_bottom; ch < HD_CHANNEL_NUM; ch++) {
+                for (uint32_t i = 0; i < recDataPtr->m_pDefect[ch].size(); i++) {
+                    if (recDataPtr->m_pDefect[ch][i]->bDefectType == 0) {
+                        // 缺陷回波记录
+                        defectEchoRecord[idx_echo].axial      = recDataPtr->m_pDefect[ch][i]->nAxialDepth;
+                        defectEchoRecord[idx_echo].radial     = recDataPtr->m_pDefect[ch][i]->nRadialDistance;
+                        defectEchoRecord[idx_echo].gain       = recDataPtr->m_pDefect[ch][i]->nSensitivity;
+                        defectEchoRecord[idx_echo].waveHeight = recDataPtr->m_pDefect[ch][i]->nWaveHeight;
+                        defectEchoRecord[idx_echo].dBDiff     = recDataPtr->m_pDefect[ch][i]->nDBOffset;
+                        idx_echo += 1;
+                    } else {
+                        // 底波衰减记录
+                        bottomWaveAttenuationRecord[idx_bottom].axial      = recDataPtr->m_pDefect[ch][i]->nAxialDepth;
+                        bottomWaveAttenuationRecord[idx_bottom].radial     = recDataPtr->m_pDefect[ch][i]->nRadialDistance;
+                        bottomWaveAttenuationRecord[idx_bottom].gain       = recDataPtr->m_pDefect[ch][i]->nSensitivity;
+                        bottomWaveAttenuationRecord[idx_bottom].waveHeight = recDataPtr->m_pDefect[ch][i]->nWaveHeight;
+                        bottomWaveAttenuationRecord[idx_bottom].dBDiff     = recDataPtr->m_pDefect[ch][i]->nDBOffset;
+                        idx_bottom += 1;
+                    }
                 }
             }
 
             return true;
         }
+
+        int  getBottomNum() const;
+        void setBottomNum(int newBottomNum);
 
     signals:
         void companyNameChanged();
@@ -109,6 +137,7 @@ namespace Ruitie {
         void defectEchoRecordChanged();
         void bottomWaveAttenuationRecordChanged();
         void defectsNumChanged();
+        void bottomNumChanged();
 
     private:
         Q_PROPERTY(QString companyName READ getCompanyName WRITE setCompanyName NOTIFY companyNameChanged)
@@ -122,6 +151,7 @@ namespace Ruitie {
         Q_PROPERTY(SP_DefModel defectEchoRecord READ getDefectEchoRecord WRITE setDefectEchoRecord NOTIFY defectEchoRecordChanged)
         Q_PROPERTY(SP_DefModel bottomWaveAttenuationRecord READ getBottomWaveAttenuationRecord WRITE setBottomWaveAttenuationRecord NOTIFY bottomWaveAttenuationRecordChanged)
         Q_PROPERTY(int defectsNum READ getDefectsNum WRITE setDefectsNum NOTIFY defectsNumChanged)
+        Q_PROPERTY(int bottomNum READ getBottomNum WRITE setBottomNum NOTIFY bottomNumChanged)
     };
 
 } // namespace Ruitie

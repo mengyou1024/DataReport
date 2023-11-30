@@ -15,7 +15,7 @@ bool Ruitie::saveFile(QString &fileName, QuarterlyRecordMsg *ptr) {
 
     ExcelRender doc;
 
-    doc.initColumnWidth({11.25, 3.0, 12.63, 13.13, 16.50, 15.00, 14.38});
+    doc.initColumnWidth({10, 2, 10, 10, 12, 12, 12});
     doc.ExcelTableHead("车轮超声波自动探伤机季度性能检查表");
     doc.ExcelNextRow();
     doc.ExcelFill<QString>(QString(), 5);

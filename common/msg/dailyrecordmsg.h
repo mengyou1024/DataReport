@@ -2,6 +2,8 @@
 
 #include "../ruitie.h"
 #include "../ruitiedefine.h"
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 
 namespace Ruitie {
     /**
@@ -58,18 +60,27 @@ namespace Ruitie {
             if (recDataPtr == nullptr) {
                 return false;
             }
+            const static QRegularExpression rexp(R"(^.*/(\d{4})(\d+)/(\d+)/[^/]*$)");
+            auto                            match    = rexp.match(fileName);
+            QDateTime                       dateTime = QDateTime::currentDateTime();
+            if (match.hasMatch()) {
+                qInfo() << match.captured(1) << match.captured(2) << match.captured(3);
+                auto dataStr = QString("%1-%2-%3").arg(match.captured(1), match.captured(2), match.captured(3));
+                dateTime     = QDateTime::fromString(dataStr, "yyyy-M-d");
+            }
 
             // 解析数据
             setCompanyName(QString::fromStdWString(recDataPtr->wheelParam.szDetectionFact));
-            setDetectDate(QDateTime::currentDateTime().toString("yyyy-M-d")); // TODO: 时间保存位置
+            setDetectDate(dateTime.toString("yyyy-M-d"));
             setDetectDeive(QString::fromStdWString(recDataPtr->wheelParam.szDeviceName));
-            setWorkFreq(2.5);
+            setWorkFreq(2.5);                                 // TODO: 频率
             setProbe(QString::fromStdWString(L"探头"));       // TODO: 探头保存位置
             setCoupledMode(QString::fromStdWString(L"水浸")); // TODO: 探头类型保存位置
             setWheelType(QString::fromStdWString(recDataPtr->wheelParam.szWheelType));
             setHeatSerial(QString::fromStdWString(recDataPtr->wheelParam.szHeatNumber));
             setWheelSerial(QString::fromStdWString(recDataPtr->wheelParam.szWheelNumber));
 
+            setDefectsNum(0);
             // 填充缺陷数据
             for (uint32_t i = 0; i < HD_CHANNEL_NUM; i++) {
                 setDefectsNum(getDefectsNum() + recDataPtr->m_pDefect[i].size());
@@ -80,7 +91,7 @@ namespace Ruitie {
                 for (uint32_t i = 0; i < recDataPtr->m_pDefect[ch].size(); i++, idx++) {
                     defectsPtr[idx].axial      = recDataPtr->m_pDefect[ch][i]->nAxialDepth;
                     defectsPtr[idx].radial     = recDataPtr->m_pDefect[ch][i]->nRadialDistance;
-                    defectsPtr[idx].gain       = recDataPtr->m_pDefect[ch][i]->nParam1; // TODO: 获取增益
+                    defectsPtr[idx].gain       = recDataPtr->m_pDefect[ch][i]->nSensitivity;
                     defectsPtr[idx].waveHeight = recDataPtr->m_pDefect[ch][i]->nWaveHeight;
                     defectsPtr[idx].dBDiff     = recDataPtr->m_pDefect[ch][i]->nDBOffset;
                 }

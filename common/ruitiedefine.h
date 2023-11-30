@@ -24,6 +24,9 @@ namespace Ruitie {
     constexpr uint32_t FK_DATA_DEFECTFILE    = 0x55545049; ///< 缺陷数据
     constexpr uint32_t FK_DATA_END           = 0x55545050; ///< 数据结束
 
+    constexpr uint32_t FK_DATA_PLCSPEED     = 0x55545051;  ///< PLC速度参数
+    constexpr uint32_t FK_DATA_GROOVESHIELD = 0x55545052;  ///< 刻槽屏蔽参数
+
     struct System {
         int32_t Frequency;     ///< 重复频率
         int32_t Voltage;       ///< 电压
@@ -82,10 +85,10 @@ namespace Ruitie {
         FLOAT fWheelRimlInnerDiameter; // 轮辋内径 6
         FLOAT fWheelRimOuterDiameter;  // 轮辋外径 7
         // 其他待定参数
-        FLOAT fTreadWidth; // 踏面探头间距（3组 轴向方向的间距，用于计算探头分段覆盖）
-        FLOAT fSideWidth;  // 侧面探头间距 （2组 径向方向的间距，用于计算探头分段覆盖）
+        FLOAT fTreadWidth;        // 踏面探头中心间距（3组 轴向方向的间距，用于计算探头分段覆盖）
+        FLOAT fSideWidth;         // 侧面探头中心间距 （2组 径向方向的间距，用于计算探头分段覆盖）
 
-        FLOAT fWheelParam3;
+        FLOAT fWheelFlangeHeight; // 轮缘厚度 （计算 踏面检测范围 轮辋厚度减去轮缘厚度）
         FLOAT fWheelParam4;
     };
 
@@ -150,8 +153,8 @@ namespace Ruitie {
         FLOAT nDACWidth[2];                 // 波门宽度 百分比  0-1 取值
 
         //	 其他待定参数
-        int nParam1;
-        int nParam2;
+        float fGateAAmpPos; // 动态DAC 记录制作DAC 第一个点的A门最高波  后面车轮踏面检测需要动态DAC
+        float fAMaxAmp_0;   // 距A门最高波 作为检测起始位置
     };
 
     // 缺陷信息 一个检测数据有多条缺陷信息
@@ -205,6 +208,40 @@ namespace Ruitie {
         TCHAR szParam4[20];
     };
 
+    struct DETECTION_GROOVE_SHIELD // 刻槽屏蔽参数
+    {
+        float fGrooveRadialPos;    // 刻槽径向位置
+        float fGrooveRadialWidth;  // 刻槽径向宽度
+        float fGrooveAxialPos;     // 超声屏蔽位置
+        float fGrooveAxialWidth;   // 超声屏蔽宽度
+
+        int nParam1;               // 预留参数位置
+        int nParam2;
+        int nParam3;
+        int nParam4;
+    };
+
+    struct PLC_SPeed_PAPA {
+        /**
+    扫差参数速度参数
+    */
+
+        // 左侧面相关  手动/自动
+        float fSideXSpeed1;
+        float fSideXSpeed2;
+        float fSideYSpeed1;
+        float fSideYSpeed2;
+
+        // 右踏面
+        float fTreadXSpeed1;
+        float fTreadXSpeed2;
+        float fTreadYSpeed1;
+        float fTreadYSpeed2;
+
+        // 转盘
+        float fRotateSpeed1;
+    };
+
     class RecData {
     public:
         System                                   paramSystem;
@@ -213,6 +250,8 @@ namespace Ruitie {
         PLC_SCAN_PAPA                            plcScanParam;
         DB_USER_DATA                             dbUserData;
         DETECTION_PARAM2995_200                  paramDetection[HD_CHANNEL_NUM];
+        PLC_SPeed_PAPA                           plcSpeedParam;
+        DETECTION_GROOVE_SHIELD                  detectionGroovShield;
         QVector<RECORD_DATA>                     m_pRecord;
         QVector<std::shared_ptr<DB_DEFECT_DATA>> m_pDefect[HD_CHANNEL_NUM];
 

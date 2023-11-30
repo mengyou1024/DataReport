@@ -85,7 +85,7 @@ namespace Ruitie {
         QString wheelType;   ///< 车轮型号
         QString heatSerial;  ///< 炉号
         QString wheelSerial; ///< 车轮编号
-        qreal   defectsNum;  ///< 缺陷数目
+        int     defectsNum;  ///< 缺陷数目
         qreal   radial;      ///< 径向
         qreal   axial;       ///< 轴向
         qreal   waveHeight;  ///< 波高
