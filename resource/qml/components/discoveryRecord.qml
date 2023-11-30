@@ -161,13 +161,13 @@ ColumnLayout {
             nameFilters: ["Excel file (*.xlsx *.xls)"]
             fileMode: FileDialog.SaveFile
             onAccepted: {
-                if (date_picker.current) {
-                    root_msg.detectDate = date_picker.current.toLocaleString(
-                                Qt.locale("zh_CN"), "yyyy-M-d")
-                } else {
-                    root_msg.detectDate = new Date().toLocaleString(
-                                Qt.locale("zh_CN"), "yyyy-M-d")
-                }
+//                if (date_picker.current) {
+//                    root_msg.detectDate = date_picker.current.toLocaleString(
+//                                Qt.locale("zh_CN"), "yyyy-M-d")
+//                } else {
+//                    root_msg.detectDate = new Date().toLocaleString(
+//                                Qt.locale("zh_CN"), "yyyy-M-d")
+//                }
                 if (root_msg.saveFile(String(currentFile).substring(8))) {
                     showSuccess(qsTr("保存文件成功"))
                     root_excelRunner.openExcel(String(currentFile).substring(8))
