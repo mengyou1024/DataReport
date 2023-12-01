@@ -104,7 +104,7 @@ namespace Ruitie {
                 recordPtr[index].axial       = axial;
                 recordPtr[index].waveHeight  = waveHeight;
                 recordPtr[index].dBDiff      = dbDiff;
-                recordPtr[index].result      = result; // TODO: result
+                recordPtr[index].result      = result;
                 recordPtr[index].sensitivity = sensitivity;
 
                 index++;

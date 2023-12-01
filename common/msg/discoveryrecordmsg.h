@@ -72,7 +72,7 @@ namespace Ruitie {
             // 解析数据
             setCompanyName(QString::fromWCharArray(recDataPtr->wheelParam.szDetectionFact));
             setDetectDate(dateTime.toString("yyyy-M-d"));
-            setWorkFreq(0);                                   // TODO: 探头频率保存位置
+            setWorkFreq(recDataPtr->paramSystem.Frequency);   // TODO: 探头频率保存位置
             setProbe(QString::fromWCharArray(L""));           // TODO: 探头保存位置
             setCoupledMode(QString::fromWCharArray(L"水浸")); // TODO: 耦合方式
             setWheelType(QString::fromWCharArray(recDataPtr->wheelParam.szWheelType));
