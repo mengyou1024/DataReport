@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     QQmlApplicationEngine engine;
     QSettings             logSetting("log/setting.ini", QSettings::IniFormat);
 
-    SingleApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);
+    // SingleApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);
 
     logSetting.beginGroup("Rules");
     auto filter = logSetting.value("filterRules");

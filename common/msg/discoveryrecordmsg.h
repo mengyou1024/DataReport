@@ -97,7 +97,7 @@ namespace Ruitie {
 
             setDefectEchoRecord(shared_ptr<defectRecordModel[]>(new defectRecordModel[getDefectsNum()]));
             setBottomWaveAttenuationRecord(shared_ptr<defectRecordModel[]>(new defectRecordModel[getBottomNum()]));
-            for (uint32_t ch = 0, idx_echo = 0, idx_bottom; ch < HD_CHANNEL_NUM; ch++) {
+            for (uint32_t ch = 0, idx_echo = 0, idx_bottom = 0; ch < HD_CHANNEL_NUM; ch++) {
                 for (uint32_t i = 0; i < recDataPtr->m_pDefect[ch].size(); i++) {
                     if (recDataPtr->m_pDefect[ch][i]->bDefectType == 0) {
                         // 缺陷回波记录

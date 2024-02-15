@@ -251,7 +251,7 @@ namespace Ruitie {
         DB_USER_DATA                             dbUserData;
         DETECTION_PARAM2995_200                  paramDetection[HD_CHANNEL_NUM];
         PLC_SPeed_PAPA                           plcSpeedParam;
-        DETECTION_GROOVE_SHIELD                  detectionGroovShield;
+        DETECTION_GROOVE_SHIELD                  detectionGroovShield[HD_CHANNEL_NUM];
         QVector<RECORD_DATA>                     m_pRecord;
         QVector<std::shared_ptr<DB_DEFECT_DATA>> m_pDefect[HD_CHANNEL_NUM];
 
