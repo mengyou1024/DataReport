@@ -30,8 +30,10 @@ ColumnLayout {
             date_picker.dayText = date.toLocaleString(locale, "d")
         }
     }
-    ScrollView {
+
+    RowLayout {
         Layout.alignment: Qt.AlignHCenter
+        Layout.fillWidth: true
         GridLayout {
             columns: 6
             columnSpacing: 10
@@ -41,7 +43,7 @@ ColumnLayout {
             }
             FluTextBox {
                 background: Rectangle {
-                    border.color: Qt.rgba(191/255, 191/255,191/255)
+                    border.color: Qt.rgba(191 / 255, 191 / 255, 191 / 255)
                 }
                 text: root_msg.companyName
                 placeholderText: "请输入单位名称"
@@ -55,7 +57,7 @@ ColumnLayout {
             }
             FluTextBox {
                 background: Rectangle {
-                    border.color: Qt.rgba(191/255, 191/255,191/255)
+                    border.color: Qt.rgba(191 / 255, 191 / 255, 191 / 255)
                 }
                 text: root_msg.instrumentType
                 placeholderText: "请输入仪器型号"
@@ -70,8 +72,8 @@ ColumnLayout {
             FluDatePicker {
                 id: date_picker
                 radius: 0
-                normalColor: Qt.rgba(238/255,238/255,238/255)
-                dividerColor: Qt.rgba(198/255,207/255,216/255)
+                normalColor: Qt.rgba(238 / 255, 238 / 255, 238 / 255)
+                dividerColor: Qt.rgba(198 / 255, 207 / 255, 216 / 255)
                 Component.onCompleted: {
                     var date = Date.fromLocaleString(Qt.locale("zh_CN"), root_msg.printDate, "yyyy-M-d")
                     var locale = Qt.locale("zh_CN")
@@ -87,7 +89,7 @@ ColumnLayout {
             }
             FluTextBox {
                 background: Rectangle {
-                    border.color: Qt.rgba(191/255, 191/255,191/255)
+                    border.color: Qt.rgba(191 / 255, 191 / 255, 191 / 255)
                 }
                 text: root_msg.instrumentSerial
                 placeholderText: "仪器编号"
@@ -101,7 +103,7 @@ ColumnLayout {
             }
             FluTextBox {
                 background: Rectangle {
-                    border.color: Qt.rgba(191/255, 191/255,191/255)
+                    border.color: Qt.rgba(191 / 255, 191 / 255, 191 / 255)
                 }
                 text: root_msg.manufactureCompany
                 placeholderText: "制造单位"
@@ -116,8 +118,8 @@ ColumnLayout {
             FluDatePicker {
                 id: manufacture_date_picker
                 radius: 0
-                normalColor: Qt.rgba(238/255,238/255,238/255)
-                dividerColor: Qt.rgba(198/255,207/255,216/255)
+                normalColor: Qt.rgba(238 / 255, 238 / 255, 238 / 255)
+                dividerColor: Qt.rgba(198 / 255, 207 / 255, 216 / 255)
                 Component.onCompleted: {
                     var date = Date.fromLocaleString(Qt.locale("zh_CN"), root_msg.manufactureDate, "yyyy-M-d")
                     var locale = Qt.locale("zh_CN")
@@ -142,18 +144,14 @@ ColumnLayout {
             fileMode: FileDialog.SaveFile
             onAccepted: {
                 if (date_picker.current) {
-                    root_msg.printDate = date_picker.current.toLocaleString(
-                                Qt.locale("zh_CN"), "yyyy-M-d")
+                    root_msg.printDate = date_picker.current.toLocaleString(Qt.locale("zh_CN"), "yyyy-M-d")
                 } else {
-                    root_msg.printDate = new Date().toLocaleString(
-                                Qt.locale("zh_CN"), "yyyy-M-d")
+                    root_msg.printDate = new Date().toLocaleString(Qt.locale("zh_CN"), "yyyy-M-d")
                 }
                 if (manufacture_date_picker.current) {
-                    root_msg.manufactureDate = manufacture_date_picker.current.toLocaleString(
-                                Qt.locale("zh_CN"), "yyyy-M-d")
+                    root_msg.manufactureDate = manufacture_date_picker.current.toLocaleString(Qt.locale("zh_CN"), "yyyy-M-d")
                 } else {
-                    root_msg.manufactureDate = new Date().toLocaleString(
-                                Qt.locale("zh_CN"), "yyyy-M-d")
+                    root_msg.manufactureDate = new Date().toLocaleString(Qt.locale("zh_CN"), "yyyy-M-d")
                 }
 
                 if (root_msg.saveFile(String(currentFile).substring(8))) {
@@ -171,7 +169,7 @@ ColumnLayout {
             normalColor: "lightblue"
             hoverColor: Qt.lighter("lightblue", 1.2)
             background: Rectangle {
-                color: parent.hovered? parent.hoverColor: parent.normalColor
+                color: parent.hovered ? parent.hoverColor : parent.normalColor
             }
             onClicked: {
                 save_dialog.open()
@@ -184,10 +182,10 @@ ColumnLayout {
             hoverColor: "#1874cd"
             normalColor: "#eeeeee"
             background: Rectangle {
-                color: parent.hovered? parent.hoverColor: parent.normalColor
+                color: parent.hovered ? parent.hoverColor : parent.normalColor
             }
             onClicked: {
-//                flushTable()
+                //                flushTable()
                 root_filleSelect.open()
             }
         }
@@ -229,8 +227,8 @@ ColumnLayout {
                 delegate: Rectangle {
                     implicitHeight: 36
                     implicitWidth: 96
-                    color: Qt.rgba(238/255,238/255,238/255)
-                    border.color: Qt.rgba(198/255,207/255,216/255)
+                    color: Qt.rgba(238 / 255, 238 / 255, 238 / 255)
+                    border.color: Qt.rgba(198 / 255, 207 / 255, 216 / 255)
                     FluText {
                         anchors.centerIn: parent
                         text: display
@@ -252,7 +250,7 @@ ColumnLayout {
         rootDir: dataDir
         dirType: filePrefix
         onAccepted: {
-            if(!root_msg.loadFile(filePath)) {
+            if (!root_msg.loadFile(filePath)) {
                 showError("打开文件失败!")
             } else {
                 showSuccess("打开文件成功!")

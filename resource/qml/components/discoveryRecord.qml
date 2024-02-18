@@ -20,8 +20,10 @@ ColumnLayout {
             date_picker.dayText = _date.toLocaleString(Qt.locale(), "d")
         }
     }
-    ScrollView {
+
+    RowLayout {
         Layout.alignment: Qt.AlignHCenter
+        Layout.fillWidth: true
         GridLayout {
             columns: 6
             columnSpacing: 10

@@ -20,8 +20,10 @@ ColumnLayout {
             date_picker.dayText = _date.toLocaleString(Qt.locale(), "d")
         }
     }
-    ScrollView {
+
+    RowLayout {
         Layout.alignment: Qt.AlignHCenter
+        Layout.fillWidth: true
         GridLayout {
             columns: 8
             columnSpacing: 10
@@ -31,7 +33,7 @@ ColumnLayout {
             }
             FluTextBox {
                 background: Rectangle {
-                    border.color: Qt.rgba(191/255, 191/255,191/255)
+                    border.color: Qt.rgba(191 / 255, 191 / 255, 191 / 255)
                 }
                 text: root_msg.companyName
                 placeholderText: "请输入单位名称"
@@ -45,7 +47,7 @@ ColumnLayout {
             }
             FluTextBox {
                 background: Rectangle {
-                    border.color: Qt.rgba(191/255, 191/255,191/255)
+                    border.color: Qt.rgba(191 / 255, 191 / 255, 191 / 255)
                 }
                 text: root_msg.deviceName
                 placeholderText: "请输入设备名称"
@@ -60,8 +62,8 @@ ColumnLayout {
             FluDatePicker {
                 Layout.columnSpan: 3
                 radius: 0
-                normalColor: Qt.rgba(238/255,238/255,238/255)
-                dividerColor: Qt.rgba(198/255,207/255,216/255)
+                normalColor: Qt.rgba(238 / 255, 238 / 255, 238 / 255)
+                dividerColor: Qt.rgba(198 / 255, 207 / 255, 216 / 255)
                 id: date_picker
             }
 
@@ -70,7 +72,7 @@ ColumnLayout {
             }
             FluTextBox {
                 background: Rectangle {
-                    border.color: Qt.rgba(191/255, 191/255,191/255)
+                    border.color: Qt.rgba(191 / 255, 191 / 255, 191 / 255)
                 }
                 text: root_msg.deviceType
                 placeholderText: "请输入设备型号"
@@ -83,7 +85,7 @@ ColumnLayout {
             }
             FluTextBox {
                 background: Rectangle {
-                    border.color: Qt.rgba(191/255, 191/255,191/255)
+                    border.color: Qt.rgba(191 / 255, 191 / 255, 191 / 255)
                 }
                 text: root_msg.deviceSerial
                 placeholderText: "请输入设备编号"
@@ -96,7 +98,7 @@ ColumnLayout {
             }
             FluTextBox {
                 background: Rectangle {
-                    border.color: Qt.rgba(191/255, 191/255,191/255)
+                    border.color: Qt.rgba(191 / 255, 191 / 255, 191 / 255)
                 }
                 text: root_msg.detectStandard
                 Layout.columnSpan: 3
@@ -110,7 +112,7 @@ ColumnLayout {
             }
             FluTextBox {
                 background: Rectangle {
-                    border.color: Qt.rgba(191/255, 191/255,191/255)
+                    border.color: Qt.rgba(191 / 255, 191 / 255, 191 / 255)
                 }
                 text: root_msg.detectContent
                 placeholderText: "请输入探伤内容"
@@ -123,7 +125,7 @@ ColumnLayout {
             }
             FluTextBox {
                 background: Rectangle {
-                    border.color: Qt.rgba(191/255, 191/255,191/255)
+                    border.color: Qt.rgba(191 / 255, 191 / 255, 191 / 255)
                 }
                 text: root_msg.detectRegion
                 placeholderText: "请输入探伤区域"
@@ -137,7 +139,7 @@ ColumnLayout {
             }
             FluTextBox {
                 background: Rectangle {
-                    border.color: Qt.rgba(191/255, 191/255,191/255)
+                    border.color: Qt.rgba(191 / 255, 191 / 255, 191 / 255)
                 }
                 text: root_msg.probe
                 placeholderText: "探头"
@@ -153,7 +155,7 @@ ColumnLayout {
             RowLayout {
                 FluTextBox {
                     background: Rectangle {
-                        border.color: Qt.rgba(191/255, 191/255,191/255)
+                        border.color: Qt.rgba(191 / 255, 191 / 255, 191 / 255)
                     }
                     text: root_msg.soundSpeed
                     validator: IntValidator {
@@ -182,11 +184,9 @@ ColumnLayout {
             fileMode: FileDialog.SaveFile
             onAccepted: {
                 if (date_picker.current) {
-                    root_msg.detectDate = date_picker.current.toLocaleString(
-                                Qt.locale("zh_CN"), "yyyy-M-d")
+                    root_msg.detectDate = date_picker.current.toLocaleString(Qt.locale("zh_CN"), "yyyy-M-d")
                 } else {
-                    root_msg.detectDate = new Date().toLocaleString(
-                                Qt.locale("zh_CN"), "yyyy-M-d")
+                    root_msg.detectDate = new Date().toLocaleString(Qt.locale("zh_CN"), "yyyy-M-d")
                 }
                 if (root_msg.saveFile(String(currentFile).substring(8))) {
                     showSuccess(qsTr("保存文件成功"))
@@ -203,7 +203,7 @@ ColumnLayout {
             normalColor: "lightblue"
             hoverColor: Qt.lighter("lightblue", 1.2)
             background: Rectangle {
-                color: parent.hovered? parent.hoverColor: parent.normalColor
+                color: parent.hovered ? parent.hoverColor : parent.normalColor
             }
             onClicked: {
                 save_dialog.open()
@@ -216,10 +216,10 @@ ColumnLayout {
             hoverColor: "#1874cd"
             normalColor: "#eeeeee"
             background: Rectangle {
-                color: parent.hovered? parent.hoverColor: parent.normalColor
+                color: parent.hovered ? parent.hoverColor : parent.normalColor
             }
             onClicked: {
-//                flushTable()
+                //                flushTable()
                 root_filleSelect.open()
             }
         }
@@ -259,8 +259,8 @@ ColumnLayout {
                 delegate: Rectangle {
                     implicitHeight: 36
                     implicitWidth: 96
-                    color: Qt.rgba(238/255,238/255,238/255)
-                    border.color: Qt.rgba(198/255,207/255,216/255)
+                    color: Qt.rgba(238 / 255, 238 / 255, 238 / 255)
+                    border.color: Qt.rgba(198 / 255, 207 / 255, 216 / 255)
                     FluText {
                         anchors.centerIn: parent
                         text: display
@@ -285,7 +285,7 @@ ColumnLayout {
         rootDir: dataDir
         dirType: filePrefix
         onAccepted: {
-            if(!root_msg.loadFile(filePath)) {
+            if (!root_msg.loadFile(filePath)) {
                 showError("打开文件失败!")
             } else {
                 showSuccess("打开文件成功!")

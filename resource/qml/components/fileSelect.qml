@@ -47,7 +47,7 @@ Dialog {
         anchors.margins: 20
         ColumnLayout {
             GridLayout {
-                columns: showFile?3:2
+                columns: showFile ? 3 : 2
                 Text {
                     text: qsTr("年/月")
                     font.pixelSize: 14
@@ -102,7 +102,7 @@ Dialog {
                     }
                     onClicked: {
                         if (showFile) {
-                            filePath = String(folder_time.folder + "/" +folder_time.currentText).substring(8)
+                            filePath = String(folder_time.folder + "/" + folder_time.currentText).substring(8)
                         } else {
                             filePath = String(folder_time.folder + "/").substring(8)
                         }
