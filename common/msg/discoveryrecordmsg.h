@@ -75,7 +75,7 @@ namespace Ruitie {
             setWorkFreq(recDataPtr->paramSystem.Frequency);   // TODO: 探头频率保存位置
             setProbe(QString::fromWCharArray(L""));           // TODO: 探头保存位置
             setCoupledMode(QString::fromWCharArray(L"水浸")); // TODO: 耦合方式
-            setWheelType(QString::fromWCharArray(recDataPtr->wheelParam.szWheelType));
+            setWheelType(QString::fromWCharArray(recDataPtr->wheelParam.szWheelModel));
             setHeatSerial(QString::fromWCharArray(recDataPtr->wheelParam.szHeatNumber));
             setWheelSerial(QString::fromWCharArray(recDataPtr->wheelParam.szWheelNumber));
             setDefectsNum(0);

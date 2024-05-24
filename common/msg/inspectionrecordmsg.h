@@ -96,7 +96,7 @@ namespace Ruitie {
                     }
                 }
 
-                recordPtr[index].wheelType   = QString::fromStdWString(recDataPtr->wheelParam.szWheelType);
+                recordPtr[index].wheelType   = QString::fromStdWString(recDataPtr->wheelParam.szWheelModel);
                 recordPtr[index].heatSerial  = QString::fromStdWString(recDataPtr->wheelParam.szHeatNumber);
                 recordPtr[index].wheelSerial = QString::fromStdWString(recDataPtr->wheelParam.szWheelNumber);
                 recordPtr[index].defectsNum  = defectsNum;
