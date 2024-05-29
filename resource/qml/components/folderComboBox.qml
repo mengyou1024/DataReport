@@ -11,6 +11,7 @@ ComboBox {
     model: FolderListModel {
         showFiles: false
         id: folder
+        sortReversed: true
     }
     currentIndex: 0
     textRole: "fileName"

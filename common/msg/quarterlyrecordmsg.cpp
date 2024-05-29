@@ -52,7 +52,7 @@ bool Ruitie::saveFile(QString &fileName, QuarterlyRecordMsg *ptr) {
     }
     doc.ExcelNextRow();
     int j = 0;
-    for (auto it : {"A1", "A2", "A3", "A4", "B1", "C1", "D1", "D2", "D3", "D4"}) {
+    for (auto it : {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}) {
         doc.ExcelFill(it, 2);
         for (int i = 0; i < 5; i++) {
             doc.ExcelFill(ptr->performance[j][i]);

@@ -33,7 +33,7 @@ QVariant Ruitie::PerformanceRecordView::data(const QModelIndex &index, int role)
         return temp[index.column()];
     } else {
         if (index.column() == 0) {
-            static QVector<QString> temp = {"A1", "A2", "A3", "A4", "B1", "C1", "D1", "D2", "D3", "D4"};
+            static QVector<QString> temp = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
             return temp[index.row() - 5];
         } else {
             if (performanceRecordPtr) {
